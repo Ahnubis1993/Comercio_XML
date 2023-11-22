@@ -18,13 +18,4 @@
     <anio>1</anio>
     <tarifaPorDia>1</tarifaPorDia>
   </coche>
-  <coche id="3">
-    <matricula>2222WWW</matricula>
-    <descripcion>
-      <marca>2</marca>
-      <modelo>2</modelo>
-    </descripcion>
-    <anio>2</anio>
-    <tarifaPorDia>2</tarifaPorDia>
-  </coche>
 </Coches>

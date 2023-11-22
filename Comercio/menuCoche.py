@@ -12,7 +12,7 @@ def guardar(cochesRaiz):
     :rtype: str
     """
     
-    file = open("Coches\\coches.xml", "w")
+    file = open("C:\\Users\\34618\\Desktop\\Nuevo Eclipse 2023\\Proyecto_XML\\Comercio_XML\\Comercio\Coches\\coches.xml", "w")
     archivoDefinido = prettify(cochesRaiz)
     
     lineas = archivoDefinido.split("\n")
@@ -149,13 +149,16 @@ def crearCoche(cochesRaiz):
     # guarda cuando sale bucle   
     guardar(cochesRaiz)
 
+# Hecho
 def eliminarCoche(cochesRaiz):
     coche=buscarCoche(cochesRaiz)
     if(coche is not None):
         cochesRaiz.remove(coche)
-        print("Coche eliminado exitosamente.")
+        print("\nCoche eliminado exitosamente.")
+        guardar(cochesRaiz)
+
     else:
-        print("La busqueda ha sido cancelada")
+        print("Borrado de coche ha sido cancelado")
     
 def buscarCoche(cochesRaiz):
     
@@ -259,7 +262,7 @@ def buscarCoche(cochesRaiz):
 
             
 
-def modificarCoche():
+def modificarCoche(cochesRaiz):
     
     """
     menu que usa los
@@ -270,8 +273,13 @@ def modificarCoche():
     :rtype: str
     """    
 
-    print("Modificando Coches")
-
+    coche = buscarCoche(cochesRaiz)
+   
+    if(coche is not None):
+         opcion = menuAtributos()
+    else:
+        print("Modificacion cancelada")
+    
 # Hecho
 def mostrarCoches(cochesRaiz, posicion):
     
@@ -368,7 +376,7 @@ def menuAtributos():
     
     fin = False
     while(not fin):
-        print("Elige campo a buscar")
+        print("Elige atributo")
         print("\n--- Atributos ---\n")
         print("1 - Matricula")
         print("2 - Marca")
@@ -415,7 +423,7 @@ def menuCoches():
     
     try:
         # Si hay archivo, coge la raiz 'Coches'
-        cochesRaiz = ET.parse("Coches\\coches.xml").getroot()
+        cochesRaiz = ET.parse("C:\\Users\\34618\\Desktop\\Nuevo Eclipse 2023\\Proyecto_XML\\Comercio_XML\\Comercio\Coches\\coches.xml").getroot()
     except:
         print("No existe el documento, lo creamos")
         # Si no hay archivo, crea la raiz 'Coches'
@@ -442,7 +450,7 @@ def menuCoches():
             elif(opcion == 3):
                 buscarCoche(cochesRaiz)
             elif(opcion == 4):
-                modificarCoche()
+                modificarCoche(cochesRaiz)
             elif(opcion == 5):
                 mostrarCoches(cochesRaiz,-1)
             elif(opcion == 6):
