@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<Coches>
+  <coche id="1">
+    <matricula>1111WWW</matricula>
+    <descripcion>
+      <marca>1</marca>
+      <modelo>1</modelo>
+    </descripcion>
+    <anio>1</anio>
+    <tarifaPorDia>1</tarifaPorDia>
+  </coche>
+  <coche id="2">
+    <matricula>1111WWW</matricula>
+    <descripcion>
+      <marca>1</marca>
+      <modelo>1</modelo>
+    </descripcion>
+    <anio>1</anio>
+    <tarifaPorDia>1</tarifaPorDia>
+  </coche>
+  <coche id="3">
+    <matricula>2222WWW</matricula>
+    <descripcion>
+      <marca>2</marca>
+      <modelo>2</modelo>
+    </descripcion>
+    <anio>2</anio>
+    <tarifaPorDia>2</tarifaPorDia>
+  </coche>
+</Coches>

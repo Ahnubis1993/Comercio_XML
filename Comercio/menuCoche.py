@@ -44,6 +44,7 @@ def prettify(elem):
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
 
+# Hecho
 def crearCoche(cochesRaiz):
     
     """
@@ -148,8 +149,13 @@ def crearCoche(cochesRaiz):
     # guarda cuando sale bucle   
     guardar(cochesRaiz)
 
-def eliminarCoche():
-    print("Eliminando Coches")
+def eliminarCoche(cochesRaiz):
+    coche=buscarCoche(cochesRaiz)
+    if(coche is not None):
+        cochesRaiz.remove(coche)
+        print("Coche eliminado exitosamente.")
+    else:
+        print("La busqueda ha sido cancelada")
     
 def buscarCoche(cochesRaiz):
     
@@ -163,14 +169,12 @@ def buscarCoche(cochesRaiz):
     """
     
     print("\n--- Busqueda Coche ---\n")
-    contadorCoches = 0
     cochesEncontrados = []
     cocheDevuelto = None
     salir = False
     if(len(cochesRaiz.findall('coche'))>0):
         
         while(not salir):
-            contadorCoches = 0
             opcion = menuAtributos()
 
             if(opcion == "1"):
@@ -179,9 +183,6 @@ def buscarCoche(cochesRaiz):
                     matriculaEncontrada = coche.find('matricula')
                     if(matriculaEncontrada is not None and matriculaEncontrada.text==matricula.upper()):
                         cochesEncontrados.append(coche)
-                        mostrarCoches(cochesRaiz, contadorCoches)
-                
-                    contadorCoches+=1
                     
             elif(opcion=="2"):
                 marca = input("\nIntroduce marca a buscar").strip()
@@ -189,9 +190,6 @@ def buscarCoche(cochesRaiz):
                     marcaEncontrada = coche.find('.//marca')
                     if(marcaEncontrada is not None and marcaEncontrada.text==marca.upper()):
                         cochesEncontrados.append(coche)
-                        mostrarCoches(cochesRaiz, contadorCoches)
-                
-                    contadorCoches+=1
                     
             elif(opcion=="3"):
                 modelo = input("\nIntroduce modelo a buscar").strip()
@@ -199,9 +197,6 @@ def buscarCoche(cochesRaiz):
                     modeloEncontrado = coche.find('.//marca')
                     if(modeloEncontrado is not None and modeloEncontrado.text==modelo.upper()):
                         cochesEncontrados.append(coche)
-                        mostrarCoches(cochesRaiz, contadorCoches)
-                
-                    contadorCoches+=1
                     
             elif(opcion=="4"):
                 anio = input("\nIntroduce anio de fabricacion a buscar").strip()
@@ -210,9 +205,6 @@ def buscarCoche(cochesRaiz):
                         anioEncontrado = coche.find('anio')
                         if(anioEncontrado is not None and anioEncontrado.text==anio.upper()):
                             cochesEncontrados.append(coche)
-                            mostrarCoches(cochesRaiz, contadorCoches)
-                    
-                        contadorCoches+=1
                 else:
                     print("Error. Debes introducir un numero")
             
@@ -223,9 +215,6 @@ def buscarCoche(cochesRaiz):
                         tarifaEncontrado = coche.find('tarifaPorDia')
                         if(tarifaEncontrado is not None and tarifaEncontrado.text==tarifa.upper()):
                             cochesEncontrados.append(coche)
-                            mostrarCoches(cochesRaiz, contadorCoches)
-                    
-                        contadorCoches+=1
                 else:
                     print("Error. Debes introducir un numero")
             
@@ -236,13 +225,28 @@ def buscarCoche(cochesRaiz):
                 print("Opcion incorrecta")
                 
             if(not salir):
-                print("--- Resultado busqueda ---")
-                contadorCoches = 0
+                print("\n--- Resultado busqueda ---")
+                for coche in cochesEncontrados:
+                    id = coche.get('id')
+                    idNum = int(id)
+                    # Restamos porque el id siempre es +1 mayor a la posicion del archivo
+                    mostrarCoches(cochesRaiz, idNum-1)
                 if(len(cochesEncontrados)>1):
                     # Seleccionar la posicion
-                    print("HACER SELECCION POSICION")
-                elif(len(cochesEncontrados)>1):
+                    salirPosicion = False
+                    while(not salirPosicion):
+                        # Para el usuario la posicion empezara desde 1
+                        posicionCoche = input("Introduce numero de coche a buscar").strip()
+                        if(posicionCoche.isdigit() and 0<int(posicionCoche)<=len(cochesEncontrados)):
+                            # Restamos 1 a la eleccion del usuario para coger la posicion correcta en el archivo
+                            cocheDevuelto = cochesEncontrados[int(posicionCoche)-1]
+                            salir = True
+                            salirPosicion = True
+                        else:
+                            print("Error. Debes introducir un numero entre 1 y " + str(len(cochesEncontrados)))
+                elif(len(cochesEncontrados)==1):
                     cocheDevuelto=cochesEncontrados[0]
+                    salir = True
                 else:
                     if(not confirmacion("No se han encontrado resultados, quieres buscar d enuevo (S/N)")):
                         salir=True
@@ -268,6 +272,7 @@ def modificarCoche():
 
     print("Modificando Coches")
 
+# Hecho
 def mostrarCoches(cochesRaiz, posicion):
     
     """
@@ -297,7 +302,8 @@ def mostrarCoches(cochesRaiz, posicion):
                     
             numeroCoche = numeroCoche + 1
     else:
-        coche = cochesRaiz[posicion - 1]
+        # Coge el coche en la posicion que se le envia por 2 parametro
+        coche = cochesRaiz[posicion]
         print("\nCoche:" + str(posicion+1))
         # Primera fila de atributos
         for atributo in coche:
@@ -432,7 +438,7 @@ def menuCoches():
             if(opcion == 1):
                 crearCoche(cochesRaiz)
             elif(opcion == 2):
-                eliminarCoche()
+                eliminarCoche(cochesRaiz)
             elif(opcion == 3):
                 buscarCoche(cochesRaiz)
             elif(opcion == 4):
