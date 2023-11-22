@@ -70,9 +70,9 @@ def crearCoche(cochesRaiz):
         while(intentos>0 and not correcto):
             matricula = input("\nIntroduce matricula").strip()
             if(matricula.isalnum and len(matricula) == 7):
-                letras = matricula[:4]
-                numeros = matricula[4:]
-                if(letras.isdigit and numeros.isalpha):
+                numeros = matricula[:4]
+                letras = matricula[4:]
+                if(numeros.isdigit and letras.isalpha):
                     # Compruebo que no este repetida, que lea en mayus, ya que los insertamos en mayus
                     if(not repetido(cochesRaiz, matricula.upper())):
                         matriculaXML = ET.SubElement(coche, 'matricula')
@@ -153,8 +153,11 @@ def crearCoche(cochesRaiz):
 def eliminarCoche(cochesRaiz):
     coche=buscarCoche(cochesRaiz)
     if(coche is not None):
-        cochesRaiz.remove(coche)
-        print("\nCoche eliminado exitosamente.")
+        if(confirmacion("Estas seguro que deseas eliminar el coche"+coche[0].text+" (S/N)")):
+            cochesRaiz.remove(coche)
+            print("\nCoche eliminado exitosamente.")
+        else:
+            print("Borrado de coche ha sido cancelado")
         guardar(cochesRaiz)
 
     else:
@@ -213,7 +216,7 @@ def buscarCoche(cochesRaiz):
             
             elif(opcion=="5"):
                 tarifa = input("\nIntroduce tarifa por dia a buscar").strip()
-                if(anio.isdigit()):
+                if(tarifa.isdigit()):
                     for coche in cochesRaiz:
                         tarifaEncontrado = coche.find('tarifaPorDia')
                         if(tarifaEncontrado is not None and tarifaEncontrado.text==tarifa.upper()):
@@ -297,31 +300,31 @@ def mostrarCoches(cochesRaiz, posicion):
         print("\n--- Mostrar todos los Coches ---\n")
         ## Elemento Coche en coches
         for coche in cochesRaiz:
-            print("\nCoche:" + str(numeroCoche))
+            print("\nCoche:",numeroCoche)
             # Primera fila de atributos
             for atributo in coche:
                 if(atributo.tag == "descripcion"):
-                    print("\t"+atributo.tag+":" + atributo.text, end="")
+                    print("\t"+atributo.tag,":", atributo.text)
                     # 2 fila de atributos en descripcion
                     for descripcion in atributo:
-                        print("\t\t"+descripcion.tag+":" + descripcion.text)
+                        print("\t\t",descripcion.tag,":", descripcion.text)
                 else:    
-                    print("\t"+atributo.tag+":" + atributo.text)
+                    print("\t"+atributo.tag,":",atributo.text)
                     
             numeroCoche = numeroCoche + 1
     else:
         # Coge el coche en la posicion que se le envia por 2 parametro
         coche = cochesRaiz[posicion]
-        print("\nCoche:" + str(posicion+1))
+        print("\nCoche:",posicion+1)
         # Primera fila de atributos
         for atributo in coche:
             if(atributo.tag == "descripcion"):
-                print("\t"+atributo.tag+":" + atributo.text, end="")
+                print("\t",atributo.tag,":",atributo.text)
                 # 2 fila de atributos en descripcion
                 for descripcion in atributo:
-                    print("\t\t"+descripcion.tag+":" + descripcion.text)
+                    print("\t\t",descripcion.tag,":",descripcion.text)
             else:    
-                print("\t"+atributo.tag+":" + atributo.text)
+                print("\t",atributo.tag,":",atributo.text)
         
             
 def devolverCoche():

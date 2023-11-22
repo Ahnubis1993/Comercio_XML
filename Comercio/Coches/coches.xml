@@ -10,12 +10,48 @@
     <tarifaPorDia>1</tarifaPorDia>
   </coche>
   <coche id="2">
-    <matricula>1111WWW</matricula>
+    <matricula>2222WWW</matricula>
     <descripcion>
-      <marca>1</marca>
-      <modelo>1</modelo>
+      <marca>2</marca>
+      <modelo>2</modelo>
     </descripcion>
-    <anio>1</anio>
-    <tarifaPorDia>1</tarifaPorDia>
+    <anio>2</anio>
+    <tarifaPorDia>2</tarifaPorDia>
+  </coche>
+  <coche id="3">
+    <matricula>3333EEE</matricula>
+    <descripcion>
+      <marca>3</marca>
+      <modelo>3</modelo>
+    </descripcion>
+    <anio>3</anio>
+    <tarifaPorDia>3</tarifaPorDia>
+  </coche>
+  <coche id="4">
+    <matricula>4444WWW</matricula>
+    <descripcion>
+      <marca>4</marca>
+      <modelo>4</modelo>
+    </descripcion>
+    <anio>4</anio>
+    <tarifaPorDia>4</tarifaPorDia>
+  </coche>
+  <coche id="5">
+    <matricula>5555WWW</matricula>
+    <descripcion>
+      <marca>5</marca>
+      <modelo>5</modelo>
+    </descripcion>
+    <anio>5</anio>
+    <tarifaPorDia>5</tarifaPorDia>
+  </coche>
+  <coche id="6">
+    <matricula>6666WWW</matricula>
+    <descripcion>
+      <marca>6</marca>
+      <modelo>6</modelo>
+    </descripcion>
+    <anio>6</anio>
+    <tarifaPorDia>6</tarifaPorDia>
   </coche>
 </Coches>
