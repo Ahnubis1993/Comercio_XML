@@ -1,5 +1,5 @@
-from menuCoche import menuCoches
-from menuAlquiler import menuAlquiler
+from Coche import menuCoches
+from Alquiler import menuAlquiler
 
 fin = False 
 while(not fin):
@@ -8,7 +8,7 @@ while(not fin):
     print("1 - Menu Coches")
     print("2 - Menu Alquiler")
     print("0 - Salir")
-    opcion = input("Elige una opcion")
+    opcion = input("Elige una opcion: ")
     
     if(opcion == "1"):
         menuCoches()
