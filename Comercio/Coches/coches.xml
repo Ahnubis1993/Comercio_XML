@@ -13,7 +13,7 @@
   <Coche id="3">
     <Matricula>3333WWW</Matricula>
     <Descripcion>
-      <Marca>3</Marca>
+      <Marca>Awa de owo</Marca>
       <Modelo>3</Modelo>
     </Descripcion>
     <AnioFabricacion>3</AnioFabricacion>
@@ -21,13 +21,9 @@
     <Estado>disponible</Estado>
   </Coche>
   <Coche id="4">
-    <Matricula>4444WWW</Matricula>
+    <Matricula>7777WWW</Matricula>
     <Descripcion>
-      <Marca>4</Marca>
-      <Modelo/>
+      <Marca>Ford</Marca>
     </Descripcion>
-    <AnioFabricacion>4</AnioFabricacion>
-    <TarifaPorDia/>
-    <Estado>disponible</Estado>
   </Coche>
 </Coches>

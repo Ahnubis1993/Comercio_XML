@@ -57,7 +57,7 @@ def crearCoche(cochesRaiz):
     :rtype: str
     """
     
-    print("\n--- Alta Coche ---\n")
+    print("\n--- Alta Coche ---")
     
     fin = False
     while(not fin):
@@ -170,22 +170,21 @@ def crearCoche(cochesRaiz):
         if(correcto):
             print("\nAlta realizada correctamente")
         else:
+            cochesRaiz.remove(coche)
             print("\nAlta no realizada")
         if(not confirmacion("Desea introducir otro coche? S/N: ")):
             fin = True
 
 # Hecho
 def eliminarCoche(cochesRaiz):
-    print("\n--- Eliminar Coche ---\n")
+    print("\n--- Eliminar Coche ---")
     coche=buscarCoche(cochesRaiz, True)
     if(coche is not None):
-        if(confirmacion("Estas seguro que deseas eliminar el coche"+coche[0].text+" (S/N)")):
+        if(confirmacion("Estas seguro que deseas eliminar el coche con matricula '"+coche[0].text+"' (S/N)")):
             cochesRaiz.remove(coche)
             print("\nCoche eliminado exitosamente.")
         else:
-            print("Borrado de coche ha sido cancelado")
-        
-
+            print("La eliminacion del coche ha sido cancelada")
     else:
         print("Borrado de coche ha sido cancelado")
     
@@ -204,7 +203,6 @@ def buscarCoche(cochesRaiz, devolverUnico):
     cocheDevuelto = None
     salir = False
     if(len(cochesRaiz.findall('Coche'))>0):
-        
         while(not salir):
             opcion = menuAtributos()
 
@@ -274,7 +272,7 @@ def buscarCoche(cochesRaiz, devolverUnico):
                             salir = True
                             salirId = True
                         else:
-                            print("Introduce un numero de coche valido")
+                            print("Introduce un identificador de coche valido")
                 elif(len(cochesEncontrados)==1):
                     cocheDevuelto=cochesEncontrados[0]
                     salir = True
@@ -298,93 +296,94 @@ def modificarCoche(cochesRaiz):
     :rtype: str
     """    
 
-    print("\n--- Modificacion Coche ---\n")
+    print("\n--- Modificacion Coche ---")
     coche = buscarCoche(cochesRaiz, True)
    
     if(coche is not None):
-        finModificar = False
-        while(not finModificar):
+        cancelado = False
+        while(not cancelado):
             opcion = menuAtributos()
             
             if(opcion == "1"):
-                nuevaMatricula = input("\nIntroduce nueva matricula: ").strip()
-                if(nuevaMatricula.isalnum and len(nuevaMatricula) == 7):
+                nuevaMatricula = input("\nIntroduce la nueva matricula: ").strip().upper()
+                if(len(nuevaMatricula) == 7):
                     numeros = nuevaMatricula[:4]
                     letras = nuevaMatricula[4:]
                     if(numeros.isdigit() and letras.isalpha):
-                        if(not repetido(cochesRaiz, nuevaMatricula.upper())):
-                            if(confirmacion("Estas seguro que deseas modificar la matricula? S/N")):
-                                coche.find('matricula').text = nuevaMatricula.upper()
+                        if(not repetido(cochesRaiz, nuevaMatricula)):
+                            if(confirmacion("Estas seguro de que deseas modificar la matricula? (S/N): ")):
+                                coche.find('matricula').text = nuevaMatricula
                                 print("\nMatricula modificada correctamente")
                             else:
                                 print("Modificacion cancelada")
                         else: 
-                            print("Matricula repetida")
+                            print("Ya existe un coche con esa matricula")
                     else:
-                        print("Formato incorrecto")
+                        print("Formato no valida")
                 else:
-                    print("Matricula incorrecta")
+                    print("Matricula no valida")
                     
             elif(opcion=="2"):
-                nuevaMarca = input("\nIntroduce nueva marca: ").strip()
-                if(len(nuevaMarca) > 0):
-                    if(confirmacion("Estas seguro que deseas modificar el marca? S/N")):
-                        coche.find('.//Marca').text = nuevaMarca.upper()
+                nuevaMarca = input("\nIntroduce la nueva marca: ").strip()
+                if(nuevaMarca != ""):
+                    if(confirmacion("Estas seguro de que deseas modificar la marca? (S/N): ")):
+                        coche.find('.//Marca').text = nuevaMarca
                         print("\nMarca modificada correctamente")
                     else:
                         print("Modificacion cancelada")
                 else:
-                    print("Marca no puede estar vacia")
+                    print("La marca no puede estar vacia")
        
             elif(opcion=="3"):
-                nuevoModelo = input("\nIntroduce nueva modelo: ").strip()
-                if(len(nuevoModelo) > 0):
-                    if(confirmacion("Estas seguro que deseas modificar el modelo? S/N")):
-                        coche.find('.//Modelo').text = nuevoModelo.upper()
-                        print("\nModelo modificada correctamente")
+                nuevoModelo = input("\nIntroduce el nuevo modelo: ").strip()
+                if(nuevoModelo != ""):
+                    if(confirmacion("Estas seguro de que deseas modificar el modelo? (S/N): ")):
+                        coche.find('.//Modelo').text = nuevoModelo
+                        print("\nModelo modificado correctamente")
                     else:
                         print("Modificacion cancelada")
                 else:
-                    print("Nuevo modelo no puede estar vacio")
+                    print("El modelo no puede estar vacio")
                     
             elif(opcion=="4"):
-                nuevoAnio = input("\nIntroduce nueva anio de fabricacion: ").strip()
-                if(nuevoAnio.isdigit()):
-                   if(confirmacion("Estas seguro que deseas modificar el anio de fabricacion? S/N")):
-                       coche.find('anio').text = nuevoAnio.upper()
-                       print("\nAnio modificada correctamente")
+                nuevoAnio = input("\nIntroduce un nuevo anio de fabricacion: ").strip()
+                if(nuevoAnio.isdigit() and nuevoAnio != ""):
+                    if(confirmacion("Estas seguro de que deseas modificar el anio de fabricacion? (S/N): ")):
+                       coche.find('anio').text = nuevoAnio
+                       print("\nAnio modificado correctamente")
+                    else:
+                        print("Modificacion cancelada")
                 else:
-                    print("Error. Debes introducir un numero") 
+                    print("Debes introducir un numero") 
             
             elif(opcion=="5"):
-                nuevaTarifa = input("\nIntroduce nueva tarifa por dia: ").strip()
-                if(nuevaMatricula.isdigit()):
-                    if(confirmacion("Estas seguro que deseas modificar el tarifa por dia? S/N")):
-                        coche.find('tarifaPorDia').text = nuevaTarifa.upper()
+                nuevaTarifa = input("\nIntroduce la nueva tarifa por dia: ").strip()
+                if(nuevaTarifa.isdigit() and nuevaTarifa != ""):
+                    if(confirmacion("Estas seguro de que deseas modificar la tarifa por dia? (S/N): ")):
+                        coche.find('tarifaPorDia').text = nuevaTarifa
                         print("\nTarifa modificada correctamente")
+                    else:
+                        print("Modificacion cancelada")
                 else:
-                    print("Error. Debes introducir un numero")
-            elif():
-                nuevoEstado = input("\nIntroduce nueva estado de vehiculo: ").strip().lower()
+                    print("Debes introducir un numero")
+            elif(opcion=="6"):
+                nuevoEstado = input("\nIntroduce el nuevo estado de vehiculo (disponible/alquilado/en taller): ").strip().lower()
                 if(nuevoEstado=="disponible" or nuevoEstado=="alquilado" or nuevoEstado=="en taller"):
                     if(confirmacion("Estas seguro que deseas modificar el estado de vehiculo? S/N")):
-                        coche.find('Estado').text = nuevoEstado.lower()
+                        coche.find('Estado').text = nuevoEstado
                         print("\nEstado modificado correctamente")
                     else:
                         print("Modificacion cancelada")
-                        	
             elif(opcion=="0"):
-                finModificar = True
-                print("\n--- Modificacion cancelada ---")
+                cancelado = True
+                print("\nModificacion cancelada")
             else:
                 print("Opcion incorrecta")
              
-            if(not finModificar):
+            if(not cancelado):
                  if(not confirmacion("Quieres modificar algo mas de este coche? S/N")):
-                     finModificar = True
-                     print("\n--- El usuario ha cancelado seguir modificando el actual coche ---")
-         
-         
+                     cancelado = True
+                     print("\n--- Has terminado de modificar el coche actual ---")
     else:
         print("Modificacion cancelada")
     
@@ -401,7 +400,7 @@ def mostrarCoches(cochesRaiz, coche):
     """
     
     if(coche is None):
-        print("\n--- Mostrar todos los Coches ---\n")
+        print("\n--- Mostrar todos los Coches ---")
         ## Elemento Coche en coches
 
         for coche in cochesRaiz:
@@ -452,7 +451,7 @@ def menuAtributos():
         print("6 - Estado Coche")
         print("0 - Salir")
         opcion = input("Introduce una opcion: ")
-        if(opcion.isdigit() and int(opcion) >= 0 and int(opcion) <6):
+        if(opcion.isdigit() and 0 <= int(opcion) <=6):
             fin = True          
         else:
             print("Opcion no valida")

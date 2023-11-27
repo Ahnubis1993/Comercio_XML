@@ -1,7 +1,6 @@
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element, SubElement, Comment, ElementTree
-from Coche import buscarCoche
-from Coche import guardarCoches
+from Coche import buscarCoche, guardarCoches
 from Utilidades import confirmacion
 from datetime import datetime
 
@@ -30,20 +29,21 @@ def prettify(elem):
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
 
-def crearAlquiler(alquileresRaiz, raizDocumentoCoche):
+def crearAlquiler(alquileresRaiz, raizDocumentoCoche):#FIXME los nombres deberian ser similares
     
-    if(len(raizDocumentoCoche.findall('Coche'))>0):
+    if(len(raizDocumentoCoche.findall('Coche'))>0):#FIXME no muestra nada si no hay coches
     
         fin = False
         while(not fin):
             #se declara aqui en caso que el usuario quiera crear otro alquiler, y los anteriores datos no fueron correctos
             correcto = True
 
+            #Como los alquileres no se pueden eliminar, el id de un alquiler siempre corresponde a su posicion en el fichero + 1
             alquiler = ET.SubElement(alquileresRaiz, 'Alquiler', {'id':str(len(alquileresRaiz.findall('Alquiler'))+1)})
             print("\n--- Creando nuevo alquiler ---\n")  
             
             #No hace falta comprobar 'correcto', aqui siempre sera True
-            print("--- Buscando coche para asignar ID ---\n")
+            print("--- Buscando coche para asignar ID ---")
             correcto, coche = obtenerIdCoche(raizDocumentoCoche, alquiler)
 
             if(correcto):
@@ -61,16 +61,17 @@ def crearAlquiler(alquileresRaiz, raizDocumentoCoche):
                 
                 correcto = obtenerKmInicial(correcto, alquiler)
 
-                if(correcto):
-                    #Si se da de alta el alquiler, cambiamos valor del vehiculo a alquilado
-                    coche.find('Estado').text="alquilado"
-                    if(not confirmacion("Alquiler realizado correctamente. Desea introducir otro alquiler? S/N: ")):
-                        fin = True                    
-                
-                else:
-                    if(not confirmacion("Alquiler no realizado con exito. Desea introducir otro alquiler? S/N: ")):
-                        fin = True
+            if(correcto):
+                #Si se da de alta el alquiler, cambiamos valor del vehiculo a alquilado
+                coche.find('Estado').text="alquilado"
+                if(not confirmacion("Alquiler realizado correctamente. Desea introducir otro alquiler? S/N: ")):
+                    fin = True
             else:
+                if(not confirmacion("Alquiler no realizado con exito. Desea introducir otro alquiler? S/N: ")):
+                    alquileresRaiz.remove(alquiler)
+                    fin = True
+
+            if (not correcto):
                 fin = True
 
 def obtenerIdCoche(raizDocumentoCoche, alquiler): 
