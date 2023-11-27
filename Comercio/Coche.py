@@ -13,7 +13,7 @@ def guardarCoches(cochesRaiz):
     :rtype: str
     """
     
-    file = open("Comercio_XML\\Comercio\Coches\\coches.xml", "w")
+    file = open("Comercio\\Coches\\coches.xml", "w")
     archivoDefinido = prettify(cochesRaiz)
     
     lineas = archivoDefinido.split("\n")
@@ -67,7 +67,9 @@ def crearCoche(cochesRaiz):
         
         # 1 Subelemento Coche
         # Buscar devuelve la longitud de todos los coches creados y le suma uno, asi establece id
-        coche = ET.SubElement(cochesRaiz, 'Coche', {'id':str(len(cochesRaiz.findall('Coche'))+1)})
+        ultimoCoche = cochesRaiz.find(".//Coche[last()]")
+        ultimoId = int(ultimoCoche.get("id"))
+        coche = ET.SubElement(cochesRaiz, 'Coche', {'id':str(ultimoId+1)})#TODO Revisar
         print("* Creando nuevo coche *")
         
         while(intentos>0 and not correcto):
@@ -82,8 +84,8 @@ def crearCoche(cochesRaiz):
                     if(not repetido(cochesRaiz, matricula.upper())):
                         matriculaXML = ET.SubElement(coche, 'Matricula')
                         matriculaXML.text = matricula.upper()
-                        correcto = True
                         print("Matricula correcta")
+                        correcto = True
                     else: 
                         print("Matricula repetida")
                 else:
@@ -94,23 +96,42 @@ def crearCoche(cochesRaiz):
         
         if(correcto): 
             
-            intentos = 3
-            correcto = False
-             
             # 1.2 Subelemento descripcion
             descripcion = ET.SubElement(coche, 'Descripcion')
             
+            intentos = 3
+            correcto = False
+             
             # 1.2.1 Subelement modelo
-            marca = input("\nIntroduce marca: ").strip().lower()
-            marcaXML = ET.SubElement(descripcion,'Marca')
-            marcaXML.text = marca
-            print("Marca correcto")
+            while(intentos>0 and not correcto):
+                marca = input("\nIntroduce marca: ").strip()
+                if (marca != ""):
+                    marcaXML = ET.SubElement(descripcion,'Marca')
+                    marcaXML.text = marca
+                    print("Marca correcto")
+                    correcto = True
+                else:
+                    print("La marca no puede estar vacia")
+                    intentos -= 1
+
+        if (correcto):
+            intentos = 3
+            correcto = False
             # 1.2.2 Subelement modelo
-            modelo = input("\nIntroduce modelo: ").strip().lower()
-            modeloXML = ET.SubElement(descripcion,'Modelo')
-            modeloXML.text = modelo
-            print("Modelo correcto")
+            while(intentos>0 and not correcto):
+                modelo = input("\nIntroduce modelo: ").strip()
+                if (modelo != ""):
+                    modeloXML = ET.SubElement(descripcion,'Modelo')
+                    modeloXML.text = modelo
+                    print("Modelo correcto")
+                    correcto = True
+                else:
+                    print("El modelo no puede estar vacio")
+                    intentos -= 1
             
+        if (correcto):
+            intentos = 3
+            correcto = False
             # 1.3 Subelemento anio fabricacion
             while(intentos>0 and not correcto):
                 anio = input("\nIntroduce anio de fabricacion: ").strip()
@@ -120,7 +141,8 @@ def crearCoche(cochesRaiz):
                     print("Anio de fabricacion correcto")
                     correcto = True
                 else:
-                    print("Error. El anio debe ser un numero")
+                    intentos -= 1
+                    print("El anio debe ser un numero")
         
         if(correcto):
             
@@ -130,13 +152,14 @@ def crearCoche(cochesRaiz):
             # 1.4 tarifa por dia
             while(intentos>0 and not correcto):
                 tarifa = input("\nIntroduce tarifa por dia: ").strip()
-                if(tarifa.isdecimal):
+                if(tarifa.isdecimal and tarifa != ""):
                     tarifaXML = ET.SubElement(coche, 'TarifaPorDia')
                     tarifaXML.text = tarifa
                     print("Tarifa por dia correcto")
                     correcto = True
                 else:
-                    print("Error. Debes introducir un numero")
+                    intentos -= 1
+                    print("Debes introducir un numero")
             
             #1.5 estado coche, cuando se crea siempre esta diponible 
             estadoXML = ET.SubElement(coche, 'Estado')
@@ -146,17 +169,15 @@ def crearCoche(cochesRaiz):
         # Al final se pregunta si se quiere introducir otro coche independiente de si se ha dado de alta
         if(correcto):
             print("\nAlta realizada correctamente")
-            if(not confirmacion("Desea introducir otro coche? S/N: ")):
-                fin = True
         else:
             print("\nAlta no realizada")
-            if(not confirmacion("Desea introducir otro coche? S/N: ")):
-                fin = True
+        if(not confirmacion("Desea introducir otro coche? S/N: ")):
+            fin = True
 
 # Hecho
 def eliminarCoche(cochesRaiz):
     print("\n--- Eliminar Coche ---\n")
-    coche=buscarCoche(cochesRaiz)
+    coche=buscarCoche(cochesRaiz, True)
     if(coche is not None):
         if(confirmacion("Estas seguro que deseas eliminar el coche"+coche[0].text+" (S/N)")):
             cochesRaiz.remove(coche)
@@ -168,7 +189,7 @@ def eliminarCoche(cochesRaiz):
     else:
         print("Borrado de coche ha sido cancelado")
     
-def buscarCoche(cochesRaiz):
+def buscarCoche(cochesRaiz, devolverUnico):
     
     """
     menu que usa los
@@ -195,16 +216,16 @@ def buscarCoche(cochesRaiz):
                     
             elif(opcion=="2"):
                 marca = input("\nIntroduce marca a buscar: ").strip().lower()
-                for coche in cochesRaiz:
+                for coche in cochesRaiz:#Por cada coche se toma la marca
                     marcaEncontrada = coche.find('.//Marca')
-                    if(marcaEncontrada.text==marca.upper()):
+                    if(marca in marcaEncontrada.text.lower()):# Si la marca del coche iterado contiene el input, se aniade el coche a los resultados
                         cochesEncontrados.append(coche)
                     
             elif(opcion=="3"):
                 modelo = input("\nIntroduce modelo a buscar: ").strip().lower()
                 for coche in cochesRaiz:
                     modeloEncontrado = coche.find('.//Modelo')
-                    if(modeloEncontrado.text==modelo.upper()):
+                    if(modelo in modeloEncontrado.text.lower()):
                         cochesEncontrados.append(coche)
                     
             elif(opcion=="4"):
@@ -212,7 +233,7 @@ def buscarCoche(cochesRaiz):
                 if(anio.isdigit()):
                     for coche in cochesRaiz:
                         anioEncontrado = coche.find('AnioFabricacion')
-                        if(anioEncontrado.text==anio.upper()):
+                        if(anio in anioEncontrado.text):
                             cochesEncontrados.append(coche)
                 else:
                     print("Error. Debes introducir un numero")
@@ -222,7 +243,7 @@ def buscarCoche(cochesRaiz):
                 if(tarifa.isdigit()):
                     for coche in cochesRaiz:
                         tarifaEncontrado = coche.find('TarifaPorDia')
-                        if(tarifaEncontrado.text==tarifa.upper()):
+                        if(tarifa in tarifaEncontrado.text):
                             cochesEncontrados.append(coche)
                 else:
                     print("Error. Debes introducir un numero")
@@ -231,45 +252,36 @@ def buscarCoche(cochesRaiz):
                 if(estado=="disponible" or estado=="alquilado" or estado=="en taller"):
                     for coche in cochesRaiz:
                         estadoEncontrado = coche.find('Estado')
-                        if(estadoEncontrado.text==estado.lower()):
+                        if(estado in estadoEncontrado.text):
                             cochesEncontrados.append(coche)
                 else:
                     print("Error. Debes introducir un estado valido")
-            
             elif(opcion=="0"):
                 salir = True
-            
             else:
                 print("Opcion incorrecta")
                 
-            if(not salir):
-                print("\n--- Resultado busqueda ---")
+            if(not salir):#Si el usuario no sale se muestran los resultados
+                print("\n--- Resultados de la busqueda ---")
                 for coche in cochesEncontrados:
-                    idCoche = coche.get('id')
-                    # Restamos porque el id siempre es +1 mayor a la posicion del archivo
-                    mostrarCoches(cochesRaiz, int(idCoche)-1)
-                if(len(cochesEncontrados)>1):
-                    # Seleccionar la posicion
-                    salirPosicion = False
-                    while(not salirPosicion):
-                        # Para el usuario la posicion empezara desde 1
-                        posicionCoche = input("Introduce numero de coche a buscar: ").strip()
-                        if(posicionCoche.isdigit() and 0<int(posicionCoche)<=len(cochesEncontrados)):
-                            # Restamos 1 a la eleccion del usuario para coger la posicion correcta en el archivo
-                            cocheDevuelto = cochesEncontrados[int(posicionCoche)-1]
+                    mostrarCoches(cochesRaiz, coche)
+                if(len(cochesEncontrados)>1 and devolverUnico):
+                    salirId = False
+                    while(not salirId):#TODO revisar sintaxis
+                        idCoche = input("Introduce numero de coche a buscar: ").strip()
+                        cocheDevuelto = [coche for coche in cochesEncontrados if(coche.get("id") == idCoche)]
+                        if (cocheDevuelto is not None):
                             salir = True
-                            salirPosicion = True
+                            salirId = True
                         else:
-                            print("Error. Debes introducir un numero entre 1 y " + str(len(cochesEncontrados)))
+                            print("Introduce un numero de coche valido")
                 elif(len(cochesEncontrados)==1):
                     cocheDevuelto=cochesEncontrados[0]
                     salir = True
                 else:
                     if(not confirmacion("No se han encontrado resultados, quieres buscar de nuevo (S/N)")):
                         salir=True
-                
-    # sale si no hay coches que buscar
-    else:
+    else:   # sale si no hay coches que buscar
         print("No hay coche en la base de datos")
         
     return cocheDevuelto
@@ -287,7 +299,7 @@ def modificarCoche(cochesRaiz):
     """    
 
     print("\n--- Modificacion Coche ---\n")
-    coche = buscarCoche(cochesRaiz)
+    coche = buscarCoche(cochesRaiz, True)
    
     if(coche is not None):
         finModificar = False
@@ -377,7 +389,7 @@ def modificarCoche(cochesRaiz):
         print("Modificacion cancelada")
     
 # Hecho
-def mostrarCoches(cochesRaiz, posicion):
+def mostrarCoches(cochesRaiz, coche):
     
     """
     menu que usa los
@@ -388,27 +400,24 @@ def mostrarCoches(cochesRaiz, posicion):
     :rtype: str
     """
     
-    numeroCoche = 1
-    if(posicion==-1):
+    if(coche is None):
         print("\n--- Mostrar todos los Coches ---\n")
         ## Elemento Coche en coches
+
         for coche in cochesRaiz:
-            print("\nCoche:",numeroCoche)
+            print("\nCoche:",coche.get("id"))
             # Primera fila de atributos
             for atributo in coche:
                 if(atributo.tag == "Descripcion"):
-                    print("\t" + atributo.tag + ":", atributo.text, end='')  # Sin salto de línea aquí
+                    print("\tDescripcion:")  # Sin salto de línea aquí
                     # 2 fila de atributos en descripcion
-                    for descripcion in atributo:
-                        print("\t\t"+descripcion.tag,":", descripcion.text)
+                    for campo in atributo:
+                        print("\t\t"+campo.tag,":", campo.text)
                 else:    
                     print("\t"+atributo.tag,":",atributo.text)
-                    
-            numeroCoche = numeroCoche + 1
     else:
         # Coge el coche en la posicion que se le envia por 2 parametro
-        coche = cochesRaiz[posicion]
-        print("\nCoche:",posicion+1)
+        print("\nCoche:",coche.get("id"))
         # Primera fila de atributos
         for atributo in coche:
             if(atributo.tag == "Descripcion"):
@@ -433,8 +442,8 @@ def menuAtributos():
     
     fin = False
     while(not fin):
-        print("Elige atributo")
-        print("\n--- Atributos ---\n")
+        print("Elige un atributo")
+        print("\n--- Atributos ---")
         print("1 - Matricula")
         print("2 - Marca")
         print("3 - Modelo")
@@ -481,9 +490,9 @@ def menuCoches():
     
     try:
         # Si hay archivo, coge la raiz 'Coches'
-        cochesRaiz = ET.parse("Comercio_XML\\Comercio\Coches\\coches.xml").getroot()
+        cochesRaiz = ET.parse("Comercio\\Coches\\coches.xml").getroot()
     except:
-        print("No existe el documento, lo creamos")
+        print("No existe el documento coches.xml\nSe ha creado automaticamente")
         # Si no hay archivo, crea la raiz 'Coches'
         cochesRaiz = ET.Element('Coches')
       
@@ -496,18 +505,18 @@ def menuCoches():
         print("4 - Modificar Coches")
         print("5 - Mostrar Coches")
         print("0 - Menu Principal")
-        opcion = input("Elige una opcion")
+        opcion = input("Elige una opcion: ")
 
         if(opcion == "1"):
             crearCoche(cochesRaiz)
         elif(opcion == "2"):
             eliminarCoche(cochesRaiz)
         elif(opcion == "3"):
-            buscarCoche(cochesRaiz)
+            buscarCoche(cochesRaiz, False)
         elif(opcion == "4"):
             modificarCoche(cochesRaiz)
         elif(opcion == "5"):
-            mostrarCoches(cochesRaiz,-1)
+            mostrarCoches(cochesRaiz, None)
         elif(opcion == "0"):
             guardarCoches(cochesRaiz)
             fin = True

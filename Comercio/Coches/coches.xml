@@ -10,16 +10,6 @@
     <TarifaPorDia>1</TarifaPorDia>
     <Estado>alquilado</Estado>
   </Coche>
-  <Coche id="2">
-    <Matricula>2222WWW</Matricula>
-    <Descripcion>
-      <Marca>2</Marca>
-      <Modelo>2</Modelo>
-    </Descripcion>
-    <AnioFabricacion>2</AnioFabricacion>
-    <TarifaPorDia>2</TarifaPorDia>
-    <Estado>alquilado</Estado>
-  </Coche>
   <Coche id="3">
     <Matricula>3333WWW</Matricula>
     <Descripcion>
@@ -28,6 +18,16 @@
     </Descripcion>
     <AnioFabricacion>3</AnioFabricacion>
     <TarifaPorDia>3</TarifaPorDia>
+    <Estado>disponible</Estado>
+  </Coche>
+  <Coche id="4">
+    <Matricula>4444WWW</Matricula>
+    <Descripcion>
+      <Marca>4</Marca>
+      <Modelo/>
+    </Descripcion>
+    <AnioFabricacion>4</AnioFabricacion>
+    <TarifaPorDia/>
     <Estado>disponible</Estado>
   </Coche>
 </Coches>

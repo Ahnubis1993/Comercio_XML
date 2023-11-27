@@ -74,7 +74,7 @@ def crearAlquiler(alquileresRaiz, raizDocumentoCoche):
                 fin = True
 
 def obtenerIdCoche(raizDocumentoCoche, alquiler): 
-    coche = buscarCoche(raizDocumentoCoche)
+    coche = buscarCoche(raizDocumentoCoche, True)
     if(coche is not None): 
         if(coche.find('Estado').text=="disponible"):
             id = coche.get('id')
