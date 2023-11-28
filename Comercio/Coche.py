@@ -511,6 +511,9 @@ def menuCoches():
     """
     Menu principal para realizar operaciones con la informacion de coches.
 
+    Args:
+        None
+
     Returns:
         None
     """

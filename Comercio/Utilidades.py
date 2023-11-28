@@ -1,22 +1,23 @@
 def confirmacion(mensaje):
     
     """
-    menu que usa los
+    Solicita al usuario una confirmacion mediante un mensaje.
 
-    :param name: The name of the person to greet.
-    :type name: str
-    :return: A greeting message.
-    :rtype: str
+    Args:
+        mensaje (str): El mensaje que se mostrara al usuario.
+
+    Returns:
+        bool: True si la respuesta es afirmativa, False si es negativa.
     """
     
     salir = False
     eleccion = False
     while(not salir):
         respuesta = input(mensaje).lower()
-        if(respuesta == "s" or respuesta == "si"):
+        if(respuesta.startswith("s")):
             eleccion = True
             salir = True
-        elif(respuesta == "n" or respuesta == "no"):
+        elif(respuesta.startswith("n")):
             eleccion = False
             salir = True
         else:

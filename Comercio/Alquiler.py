@@ -115,7 +115,7 @@ def obtenerIdCoche(cochesRaiz, alquiler):
 
     Returns:
         Tuple[bool, Element]: Una tupla donde el primer elemento indica si la operacion fue exitosa y el segundo
-        elemento es el coche seleccionado. Si la operación no fue exitosa, el segundo elemento es None.
+        elemento es el coche seleccionado. Si la operacion no fue exitosa, el segundo elemento es None.
     """
     
     coche = buscarCoche(cochesRaiz, True)
@@ -137,6 +137,16 @@ def obtenerIdCoche(cochesRaiz, alquiler):
       
 def obtenerDni(alquiler):  
     
+    """
+    Obtiene y valida el DNI para ser asignado a un alquiler.
+
+    Args:
+        alquiler (Element): El elemento de alquiler al que se asignara el DNI.
+
+    Returns:
+        bool: True si el DNI es valido y se ha asignado correctamente, False en caso contrario.
+    """
+    
     intentos = 3
     correcto = False
     
@@ -154,6 +164,17 @@ def obtenerDni(alquiler):
         
 
 def obtenerFechaInicio(alquiler):
+    
+    """
+    Obtiene y valida la fecha de inicio del alquiler.
+
+    Args:
+        alquiler (Element): El elemento de alquiler al que se asignara la fecha de inicio.
+
+    Returns:
+        Tuple[bool, datetime]: Una tupla donde el primer elemento indica si la operacion fue exitosa y el segundo
+        elemento es la fecha de inicio del alquiler. Si la operacion no fue exitosa, el segundo elemento es None.
+    """
     
     intentos = 3
     correcto = False
@@ -187,6 +208,17 @@ def obtenerFechaInicio(alquiler):
 
 def obtenerFechaFinAlquiler(alquiler, fechaInicio):
     
+    """
+    Obtiene y valida la fecha de finalizacion del alquiler.
+
+    Args:
+        alquiler (Element): El elemento de alquiler al que se asignara la fecha de finalizacion.
+        fechaInicio (datetime): La fecha de inicio del alquiler.
+
+    Returns:
+        bool: True si la fecha de finalizacion es valida y se ha asignado correctamente, False en caso contrario.
+    """
+    
     intentos = 3
     correcto = False
 
@@ -219,6 +251,16 @@ def obtenerFechaFinAlquiler(alquiler, fechaInicio):
      
 def obtenerKmInicial(alquiler):
 
+    """
+    Obtiene y valida el kilometraje inicial del coche para el alquiler.
+
+    Args:
+        alquiler (Element): El elemento de alquiler al que se asignars el kilometraje inicial.
+
+    Returns:
+        bool: True si el kilometraje inicial es valido y se ha asignado correctamente, False en caso contrario.
+    """
+
     intentos = 3
     correcto = False
 
@@ -236,6 +278,18 @@ def obtenerKmInicial(alquiler):
     return correcto  
                      
 def modificarAlquiler(alquileresRaiz):
+    
+    """
+    Modifica las fechas de inicio o finalizacion de un alquiler existente. 
+    Para conseguir el alquiler se usa la funcion buscarAlquileres.
+
+    Args:
+        alquileresRaiz (Element): El elemento raiz que contiene todos los alquileres.
+
+    Returns:
+        None
+    """
+    
     print("--- Modificacion Alquiler ---")
     alquiler = busquedaAlquiler(alquileresRaiz)
     if(alquiler is not None):
@@ -309,6 +363,17 @@ def modificarAlquiler(alquileresRaiz):
                      print("\n--- Has terminado de modificar el alquiler actual ---")   
 
 def busquedaAlquiler(alquileresRaiz):
+    
+    """
+    Busca un alquiler en la lista de alquileres por el DNI del cliente.
+
+    Args:
+        alquileresRaiz (Element): El elemento raiz que contiene todos los alquileres.
+
+    Returns:
+        Element: El elemento alquiler correspondiente al DNI proporcionado, o None si no se encontro ningún alquiler.
+    """
+    
     alquiler = None
     if(len(alquileresRaiz.findall('Alquiler')) > 0):
         dni = input("Introduce el DNI del alquiler: ").strip().upper()
@@ -344,6 +409,18 @@ def busquedaAlquiler(alquileresRaiz):
     return alquiler 
 
 def devolverCoche(alquileresRaiz, cochesRaiz):
+    
+    """
+    Realiza el proceso para registrar la devolucion de un coche despues de un alquiler.
+
+    Args:
+        alquileresRaiz (Element): El elemento raiz que contiene todos los alquileres.
+        cochesRaiz (Element): El elemento raiz que contiene todos los coches.
+
+    Returns:
+        None
+    """
+    
     print("--- Devolviendo Coche ---")
     alquiler = busquedaAlquiler(alquileresRaiz)
         #O se hace todo o nada
@@ -391,6 +468,17 @@ def devolverCoche(alquileresRaiz, cochesRaiz):
             print("Tarifa final calculada correctamente.")
 
 def obtenerFechaDevolucion(alquiler):
+    
+    """
+    Solicita y valida la fecha de devolucion para un alquiler.
+
+    Args:
+        alquiler (Element): El elemento XML que representa el alquiler.
+
+    Returns:
+        Element: El elemento XML actualizado con la fecha de devolucion.
+    """
+    
     correcto = False
     while(not correcto):
         print("Fecha devolucion alquiler: ")
@@ -444,6 +532,17 @@ def obtenerFechaDevolucion(alquiler):
     return alquiler
 
 def obtenerKmFinal(alquiler):
+    
+    """
+    Solicita y valida la cantidad de kilometros al final del alquiler.
+
+    Args:
+        alquiler (Element): El elemento XML que representa el alquiler.
+
+    Returns:
+        Element: El elemento XML actualizado con la cantidad de kilometros finales.
+    """
+    
     correcto = False
     while(not correcto):
         kmFinal = input("Introduce km final alquiler - (km): ")
@@ -458,6 +557,21 @@ def obtenerKmFinal(alquiler):
     return alquiler
 
 def consultaAlquiler(alquileresRaiz, cochesRaiz):
+    
+    """
+    Permite al usuario consultar informacion sobre alquileres.
+
+    Muestra un menu de opciones que incluye la consulta de todos los alquileres,
+    la consulta de alquileres por matricula de coche y la consulta de alquileres por DNI del cliente.
+
+    Args:
+        alquileresRaiz (Element): El elemento XML que contiene la informacion de los alquileres.
+        cochesRaiz (Element): El elemento XML que contiene la informacion de los coches.
+
+    Returns:
+        None
+    """
+    
     fin = False 
     while(fin == False):
         print("\n---- Menu Consulta ----\n")
@@ -514,7 +628,18 @@ def consultaAlquiler(alquileresRaiz, cochesRaiz):
 
 def menuAlquiler(): 
    
-   #Cogemos los archivos en caso que existan
+    """
+    Funcion principal que gestiona el menu de operaciones relacionadas con los alquileres.
+    La funcion interactua con el usuario y realiza acciones en funcion de la opcion seleccionada.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    
+    #Cogemos los archivos en caso que existan
     try:
         alquileresRaiz = ET.parse("Comercio\\Alquileres\\alquileres.xml").getroot()
     except:
