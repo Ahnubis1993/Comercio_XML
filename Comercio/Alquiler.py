@@ -128,7 +128,7 @@ def obtenerFechaInicio(alquiler):
                 
             if(fechaInput==fechaFormateada):#Si los dias y los meses han sido validos para una fecha
                 fechaInicioXML = ET.SubElement(alquiler, 'FechaInicioAlquiler')
-                fechaInicioXML.text = fechaInput
+                fechaInicioXML.text = str(fechaInput)
                 correcto = True
                 print("Fecha de inicio alquiler valida")
             else:
@@ -158,7 +158,7 @@ def obtenerFechaFinAlquiler(alquiler, fechaInicio):
             fechaFormateada = fechaFin.strftime('%d/%m/%Y')
             if (fechaInput == fechaFormateada and fechaInicio < fechaFin):
                 fechaFinXML = ET.SubElement(alquiler, 'FechaFinalizacionAlquiler')
-                fechaFinXML.text = fechaInput
+                fechaFinXML.text = str(fechaInput)
                 correcto = True
                 print("Fecha de finalización de alquiler válida")
             elif (fechaInput != fechaFormateada):
@@ -305,33 +305,44 @@ def devolverCoche(alquileresRaiz, cochesRaiz):
     if(alquiler is not None):
         try:
             #Obtengo datos kmfinal y fechaDevolucion
-            alquiler = obtenerFechaDevolucion(alquiler)
-            alquiler = obtenerKmFinal(alquiler)
+            alquiler, correcto = obtenerFechaDevolucion(alquiler)
             
-            #Obtengo fechas para el calculo tarifa 
-            fechaInicio = alquiler.find('FechaInicioAlquiler').text
-            fechaDevolucion = alquiler.find('FechaDevolucionAlquiler').text
-            #para comparar, necesario formato datetime
-            fechaFromateadaInicio = datetime.strptime(fechaInicio, '%d/%m/%Y')
-            fechaFormateadaDevo = datetime.strptime(fechaDevolucion, '%d/%m/%Y')
-            
-            #calculo numero dias de diferencia entre fecha Inicio y Devolucion
-            diasDiferencia = (fechaFormateadaDevo - fechaFromateadaInicio).days
-            
-            #obtengo coche por ID_Coche de alquiler para recoger su tarifa diaria
-            idCocheAlquiler = alquiler.find('IDCoche').text
-            coche = cochesRaiz.find(f"Coche[@id='{idCocheAlquiler}']")
-            
-            #dias diferencia por la tarifa que tenga dicho coche + recargo (si hay)
-            tarifaFinal = diasDiferencia*int(coche.find('TarifaPorDia').text)
-            if(alquiler.find('Recargo') is not None):
-                tarifaFinal = tarifaFinal + int(alquiler.find('Recargo').text)
-            
-            tarifaFinalXML = ET.SubElement(alquiler, 'TarifaFinal')
-            tarifaFinalXML.text = tarifaFinal
-            
-            #cambio estado a disponible al final, cuando se ha creado la tarifa
-            coche.find('Estado').text="disponible" 
+            if(correcto):
+                alquiler, correcto = obtenerKmFinal(alquiler)
+                
+                if(correcto):   
+                    #Obtengo fechas para el calculo tarifa 
+                    fechaInicio = alquiler.find('FechaInicioAlquiler').text
+                    fechaDevolucion = alquiler.find('FechaDevolucionAlquiler').text
+                    #para comparar, necesario formato datetime
+                    fechaFromateadaInicio = datetime.strptime(fechaInicio, '%d/%m/%Y')
+                    fechaFormateadaDevo = datetime.strptime(fechaDevolucion, '%d/%m/%Y')
+                    
+                    #calculo numero dias de diferencia entre fecha Inicio y Devolucion
+                    diasDiferencia = (fechaFormateadaDevo - fechaFromateadaInicio).days
+                    
+                    #obtengo coche por ID_Coche de alquiler para recoger su tarifa diaria
+                    idCocheAlquiler = alquiler.find('IDCoche').text
+                    coche = cochesRaiz.find(f"Coche[@id='{idCocheAlquiler}']")
+                    
+                    #dias diferencia por la tarifa que tenga dicho coche + recargo (si hay)
+                    tarifaFinal = diasDiferencia*int(coche.find('TarifaPorDia').text)
+                    if(alquiler.find('Recargo') is not None):
+                        tarifaFinal = tarifaFinal + int(alquiler.find('Recargo').text)
+                    
+                    tarifaFinalXML = ET.SubElement(alquiler, 'TarifaFinal')
+                    tarifaFinalXML.text = str(tarifaFinal)
+                    print("Tarifa final calculada correctamente.")
+                    
+                    #cambio estado a disponible al final, cuando se ha creado la tarifa
+                    coche.find('Estado').text="disponible" 
+                #si se ha introducido la fecha pero no los km, destruye el objeto y sale
+                else:
+                    alquiler.remove(alquiler.find('FechaDevolucionAlquiler'))
+                    print("El coche no ha sido devuelto. Fin de devolucion de coche")
+
+            else:
+                print("El coche no ha sido devuelto. Fin de devolucion de coche")
     
         except Exception:
             # no borro tarifa final porque si se pone se crearia todo correctamente
@@ -342,12 +353,12 @@ def devolverCoche(alquileresRaiz, cochesRaiz):
             if(alquiler.find('Recargo') is not None):
                 alquiler.remove(alquiler.find('Recargo'))  
             print("Ocurrió un error en el proceso de devolucion de coche")
-        else:
-            print("Tarifa final calculada correctamente.")
+
 
 def obtenerFechaDevolucion(alquiler):
     correcto = False
-    while(not correcto):
+    intentos = 3
+    while(not correcto and intentos>0):
         print("Fecha devolucion alquiler: ")
         try:
 
@@ -376,7 +387,7 @@ def obtenerFechaDevolucion(alquiler):
             if fechaInput == fecha_formateada and fechaInicioFormato < fechaDevolucion:
                 
                 fechaDevoXML = ET.SubElement(alquiler, 'FechaDevolucionAlquiler')
-                fechaDevoXML.text = fechaInput
+                fechaDevoXML.text = str(fechaInput)
                 
                 #calculo recargo aqui para luego aplicar a tarifa final en caso que haya
                 if(fechaFinalizacionFormato < fechaDevolucion):
@@ -395,22 +406,29 @@ def obtenerFechaDevolucion(alquiler):
             print("Debes introducir numeros en la fecha")
         except Exception:
             print("Ocurrió un error en el proceso de devolucion de coche.")
+        intentos -= 1
             
-    return alquiler
+    return alquiler, correcto
 
 def obtenerKmFinal(alquiler):
     correcto = False
-    while(not correcto):
+    intentos = 3
+    kmInicial = alquiler.find('FechaInicioAlquiler').text
+    while(not correcto and intentos>0):
         kmFinal = input("Introduce km final alquiler - (km): ")
         if(kmFinal.isdigit()):
-            kmFinalXML = ET.SubElement(alquiler, 'KmFinalAlquiler')
-            kmFinalXML.text = kmFinal
-            correcto = True
-            print("KmFinalAlquiler introducido correctamente")
+            if(int(kmFinal) > int(kmInicial)):
+                kmFinalXML = ET.SubElement(alquiler, 'KmFinalAlquiler')
+                kmFinalXML.text = kmFinal
+                correcto = True
+                print("KmFinalAlquiler introducido correctamente")
+            else:
+                print("Los kilometros finales no se pueden ser menores que los kilometros iniciales")
         else:
             print("Km debe ser un numero")
+        intentos -= 1
             
-    return alquiler
+    return alquiler, correcto
 
 def consultaAlquiler(alquileresRaiz, cochesRaiz):
     fin = False 
