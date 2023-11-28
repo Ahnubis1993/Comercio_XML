@@ -71,10 +71,10 @@ def crearCoche(cochesRaiz):
         intentos = 3
         
         # 1 Subelemento Coche
-        # Buscar devuelve la longitud de todos los coches creados y le suma uno, asi establece id
+        # Se busca el id del ultimo coche para incrementarlo para el nuevo coche
         ultimoCoche = cochesRaiz.find(".//Coche[last()]")
         ultimoId = int(ultimoCoche.get("id"))
-        coche = ET.SubElement(cochesRaiz, 'Coche', {'id':str(ultimoId+1)})#TODO Revisar
+        coche = ET.SubElement(cochesRaiz, 'Coche', {'id':str(ultimoId+1)})
         print("* Creando nuevo coche *")
         
         while(intentos>0 and not correcto):
@@ -227,9 +227,9 @@ def buscarCoche(cochesRaiz, devolverUnico):
     
     cochesEncontrados = []
     cocheDevuelto = None
-    salir = False
+    cancelar = False
     if(len(cochesRaiz.findall('Coche'))>0):
-        while(not salir):
+        while(not cancelar):
             opcion = menuAtributos()
 
             if(opcion == "1"):
@@ -281,30 +281,30 @@ def buscarCoche(cochesRaiz, devolverUnico):
                 else:
                     print("Error. Debes introducir un estado valido")
             elif(opcion=="0"):
-                salir = True
+                cancelar = True
             else:
                 print("Opcion incorrecta")
                 
-            if(not salir):#Si el usuario no sale se muestran los resultados
+            if(not cancelar):#Si el usuario no ha cancelado se muestran los resultados
                 print("\n--- Resultados de la busqueda ---")
                 for coche in cochesEncontrados:
                     mostrarCoches(cochesRaiz, coche)
                 if(len(cochesEncontrados)>1 and devolverUnico):
                     salirId = False
-                    while(not salirId):#TODO revisar sintaxis
+                    while(not salirId):
                         idCoche = input("Introduce numero de coche a buscar: ").strip()
                         cocheDevuelto = [coche for coche in cochesEncontrados if(coche.get("id") == idCoche)]
                         if (cocheDevuelto is not None):
-                            salir = True
+                            cancelar = True
                             salirId = True
                         else:
                             print("Introduce un identificador de coche valido")
                 elif(len(cochesEncontrados)==1):
                     cocheDevuelto=cochesEncontrados[0]
-                    salir = True
+                    cancelar = True
                 else:
                     if(not confirmacion("No se han encontrado resultados, quieres buscar de nuevo (S/N)")):
-                        salir=True
+                        cancelar=True
     else:   # sale si no hay coches que buscar
         print("No hay coche en la base de datos")
         
@@ -394,14 +394,18 @@ def modificarCoche(cochesRaiz):
                         print("Modificacion cancelada")
                 else:
                     print("Debes introducir un numero")
-            elif(opcion=="6"):#FIXME aqui la aplicacion no deberia dejar cambiar el estado nada mas que a en taller, ya lo hace sola cuando creas y devuelves el coche
-                nuevoEstado = input("\nIntroduce el nuevo estado de vehiculo (disponible/alquilado/en taller): ").strip().lower()
-                if(nuevoEstado=="disponible" or nuevoEstado=="alquilado" or nuevoEstado=="en taller"):
+            elif(opcion=="6"):
+                nuevoEstado = input("\nIntroduce el nuevo estado de vehiculo (disponible/en taller): ").strip().lower()
+                if(nuevoEstado=="disponible" or nuevoEstado=="en taller"):
                     if(confirmacion("Estas seguro que deseas modificar el estado de vehiculo? S/N")):
                         coche.find('Estado').text = nuevoEstado
                         print("\nEstado modificado correctamente")
                     else:
                         print("Modificacion cancelada")
+                elif(nuevoEstado=="alquilado"):
+                    print("No se puede establecer un coche como alquilado. Para ello crea un alquiler con este coche.")
+                else:
+                    print(nuevoEstado,"no es un estado valido.")
             elif(opcion=="0"):
                 cancelado = True
                 print("\nModificacion cancelada")

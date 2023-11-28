@@ -307,14 +307,14 @@ def modificarAlquiler(alquileresRaiz):
                 
             print("Elige una opcion para modificar el alquiler: ")
             print("1 - Fecha de inicio alquiler")
-            print("2 - Fecha de finalización alquiler")
+            print("2 - Fecha de finalizacion alquiler")
             opcion = input("Introduce la opcion a modificar: ")
             
-            if(opcion== "1"):#TODO si se modifica la fecha inicial, deberia modificarse la fecha final si o si
+            if(opcion== "1"):
                 
-                dia = int(input("Introduce el día: "))
+                dia = int(input("Introduce el dia: "))
                 mes = int(input("Introduce el mes (numerico): "))
-                anio = int(input("Introduce el año: "))
+                anio = int(input("Introduce el anio: "))
                 
                 # Formar la fecha y verificar su validez
                 fechaInicioNueva= f"{dia:02d}/{mes:02d}/{anio:04d}"
@@ -330,7 +330,6 @@ def modificarAlquiler(alquileresRaiz):
                 else:
                     print("La fecha de inicio de alquiler no puede ser anterior a que la fecha de finalizacion")
                     
-                
             elif(opcion== "2"):
                 
                 dia = int(input("Introduce el día: "))
