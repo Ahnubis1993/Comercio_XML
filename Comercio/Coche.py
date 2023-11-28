@@ -152,7 +152,7 @@ def crearCoche(cochesRaiz):
             # 1.4 tarifa por dia
             while(intentos>0 and not correcto):
                 tarifa = input("\nIntroduce tarifa por dia: ").strip()
-                if(tarifa.isdecimal and tarifa != ""):
+                if(tarifa.isdigit() and tarifa != ""):
                     tarifaXML = ET.SubElement(coche, 'TarifaPorDia')
                     tarifaXML.text = tarifa
                     print("Tarifa por dia correcto")
@@ -180,11 +180,14 @@ def eliminarCoche(cochesRaiz):
     print("\n--- Eliminar Coche ---")
     coche=buscarCoche(cochesRaiz, True)
     if(coche is not None):
-        if(confirmacion("Estas seguro que deseas eliminar el coche con matricula '"+coche[0].text+"' (S/N)")):
-            cochesRaiz.remove(coche)
-            print("\nCoche eliminado exitosamente.")
+        if(coche.find('Estado').text != "disponible" and coche.find('Estado').text!= "en taller"):
+            if(confirmacion("Estas seguro que deseas eliminar el coche con matricula '"+coche[0].text+"' (S/N)")):
+                cochesRaiz.remove(coche)
+                print("\nCoche eliminado exitosamente.")
+            else:
+                print("La eliminacion del coche ha sido cancelada")
         else:
-            print("La eliminacion del coche ha sido cancelada")
+            print("Un coche que se encuentra en alquiler o en el taller no puede ser eliminado")
     else:
         print("Borrado de coche ha sido cancelado")
     

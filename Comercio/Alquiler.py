@@ -6,7 +6,7 @@ from datetime import datetime
 
 def guardarAlquiler(alquileresRaiz):
     
-    file = open("Comercio_XML\\Comercio\\Alquileres\\alquileres.xml", "w")
+    file = open("Comercio\\Alquileres\\alquileres.xml", "w")
     archivoDefinido = prettify(alquileresRaiz)
     
     lineas = archivoDefinido.split("\n")
@@ -199,36 +199,50 @@ def obtenerKmInicial(correcto, alquiler):
     
     return correcto  
                      
-def modificarAlquiler(): #TODO
-    print("Modificar Alquiler")
+def modificarAlquiler(alquileresRaiz): #TODO
+    print("--- Modificacion Alquiler ---")
+    alquiler = busquedaAlquiler(alquileresRaiz)
+
+def busquedaAlquiler(alquileresRaiz):
+    alquiler = None
+    if(len(alquileresRaiz.findall('Alquiler')) > 0):
+        dni = input("Introduce el DNI del alquiler: ").strip().upper()
+        #buscamos los alquiler con el Dni introducido, obviando los ya entregados
+        alquileres = [alquiler for alquiler in alquileresRaiz if alquiler.find('DNI').text == dni and alquiler.find('TarifaFinal') is None]
+        
+        #si hay alquiler con ese dni entramos a mostrar resultado
+        if(alquileres):
+            print("--- Resultado ---")
+            for alquiler in alquileres:
+                id = alquiler.get('id')
+                print("Alquiler ID: " + id)
+                for atributo in alquiler:
+                    print("\t", atributo.tag,":", atributo.text)
+            
+            #importante hay que extraer el elemento de la lista, para pasarlo por parametro como 1 solo elemento
+            if(len(alquileres) > 1):
+                finIdAlquiler = False
+                while(not finIdAlquiler):
+                    idAlquiler = input("Introduce id del alquiler a elegir")
+                    alquiler = [alquiler for alquiler in alquileres if alquiler.get('id') == idAlquiler]
+                    if(alquiler is not None):
+                        finIdAlquiler = True
+                    else:
+                        print("Introduce un identificador de alquiler valido")
+            else:
+                alquiler = alquileres[0]
+        else:
+            print("No se encontraron alquileres con el DNI introducido")
+    else:
+        print("No hay alquileres registrados")
+            
+    return alquiler 
 
 def devolverCoche(alquileresRaiz, raizDocumentoCoche):
     print("--- Devolviendo Coche ---")
-    dni = input("Introduce el DNI del alquiler: ").strip().upper()
-    #buscamos los alquiler con el Dni introducido, obviando los ya entregados
-    alquiler = [alquiler for alquiler in alquileresRaiz if alquiler.find('DNI').text == dni and alquiler.find('TarifaFinal') is None]
-    
-    if(alquiler):
-        print("--- Resultado ---")
-        for elemento in alquiler:
-            id = elemento.get('id')
-            print("Alquiler ID: " + id)
-            for elementos2 in elemento:
-                print("\t", elementos2.tag,":", elementos2.text)
-        
-        #importante hay que extraer el elemento de la lista, para pasarlo por parametro como 1 solo elemento
-        if(len(alquiler) > 1):
-            fin = False
-            while(not fin):
-                posicion = input("Introduce posicion del alquiler a elegir")
-                if(posicion.isdigit() and 0<int(posicion) <= len(alquiler)):
-                    alquiler=alquiler[int(posicion)-1]
-                    fin = True
-                else:
-                    print("Posicion no valida")
-        else:
-            alquiler = alquiler[0]      
+    alquiler = busquedaAlquiler(alquileresRaiz)
         #O se hace todo o nada
+    if(alquiler is not None):
         try:
             #Obtengo datos kmfinal y fechaDevolucion
             alquiler = obtenerFechaDevolucion(alquiler)
@@ -237,6 +251,7 @@ def devolverCoche(alquileresRaiz, raizDocumentoCoche):
             #Obtengo fechas para el calculo tarifa 
             fechaInicio = alquiler.find('FechaInicioAlquiler').text
             fechaDevolucion = alquiler.find('FechaDevolucionAlquiler').text
+            #para comparar, necesario formato datetime
             fechaFromateadaInicio = datetime.strptime(fechaInicio, '%d/%m/%Y')
             fechaFormateadaDevo = datetime.strptime(fechaDevolucion, '%d/%m/%Y')
             
@@ -249,19 +264,23 @@ def devolverCoche(alquileresRaiz, raizDocumentoCoche):
             
             #dias diferencia por la tarifa que tenga dicho coche + recargo (si hay)
             tarifaFinal = diasDiferencia*int(coche.find('TarifaPorDia').text)
-            tarifaFinal = tarifaFinal + int(alquiler.find('Recargo').text)
+            if(alquiler.find('Recargo') is not None):
+                tarifaFinal = tarifaFinal + int(alquiler.find('Recargo').text)
             
             tarifaFinalXML = ET.SubElement(alquiler, 'TarifaFinal')
             tarifaFinalXML.text = str(tarifaFinal)  
-            
-        except ValueError as e:
-            print("Error al convertir fechas")
+    
         except Exception as e:
+            # no borro tarifa final porque si se pone se crearia todo correctamente
+            if(alquiler.find('FechaDevolucionAlquiler') is not None):
+                alquiler.remove(alquiler.find('FechaDevolucionAlquiler'))
+            if(alquiler.find('KmFinalAlquiler') is not None): 
+                alquiler.remove(alquiler.find('KmFinalAlquiler'))
+            if(alquiler.find('Recargo') is not None):
+                alquiler.remove(alquiler.find('Recargo'))   
             print("Ocurrió un error en el proceso de devolucion de coche")
         else:
             print("Tarifa final calculada correctamente.")
-    else:
-        print("No hay alquiler con el DNI introducido")
 
 def obtenerFechaDevolucion(alquiler):
     correcto = False
@@ -275,32 +294,32 @@ def obtenerFechaDevolucion(alquiler):
             
             # Formar la fecha y verificar su validez
             fechaDevolucion = f"{dia:02d}/{mes:02d}/{anio}"
-            fechaDandoFormato = datetime.strptime(fechaDevolucion, '%d/%m/%Y')
-            fecha_formateada = fechaDandoFormato.strftime('%d/%m/%Y')
+            fechaDevoFormato = datetime.strptime(fechaDevolucion, '%d/%m/%Y')
+            fecha_formateada = fechaDevoFormato.strftime('%d/%m/%Y')
             
             #divido la fechaInicioaAlquiler para formartearla a fecha y comparar
             fechaI = alquiler.find('FechaInicioAlquiler').text.split('/')
-            fechaInicioConFormato = f"{int(fechaI[0]):02d}/{int(fechaI[1]):02d}/{int(fechaI[2])}"
+            #creamos formato dd/mm/aaaa
+            fechaInicio = f"{int(fechaI[0]):02d}/{int(fechaI[1]):02d}/{int(fechaI[2])}"
+            #y lo hacemos datatime para poder comparar fechas
+            fechaInicioFormato = datetime.strptime(fechaInicio, '%d/%m/%Y')
             
             #misma funcion que fechaInicio
             fechaF = alquiler.find('FechaFinalizacionAlquiler').text.split('/')
-            fechaFinalizacionConFormato = f"{int(fechaF[0]):02d}/{int(fechaF[1]):02d}/{int(fechaF[2])}"
+            fechaFinali = f"{int(fechaF[0]):02d}/{int(fechaF[1]):02d}/{int(fechaF[2])}"
+            fechaFinalizacionFormato = datetime.strptime(fechaFinali, '%d/%m/%Y')
             
             #la fecha devolucion no puede ser menor que la fecha de inicio de alquiler
-            if fechaDevolucion == fecha_formateada and fechaInicioConFormato < fechaDevolucion:
+            if fechaDevolucion == fecha_formateada and fechaInicioFormato < fechaDevoFormato:
                 
                 fechaDevoXML = ET.SubElement(alquiler, 'FechaDevolucionAlquiler')
                 fechaDevoXML.text = fechaDevolucion
                 
                 #calculo recargo aqui para luego aplicar a tarifa final en caso que haya
-                if(fechaFinalizacionConFormato < fechaDevolucion):
+                if(fechaFinalizacionFormato < fechaDevoFormato):
                     recargoXML = ET.SubElement(alquiler, 'Recargo')
                     recargoXML.text = "150"
-                else:
-                    recargoXML = ET.SubElement(alquiler, 'Recargo')
-                    recargoXML.text = "0"
                     
-
                 correcto = True
                 print("Fecha devolucion alquiler válida")
             else:
@@ -310,7 +329,9 @@ def obtenerFechaDevolucion(alquiler):
                     print("La fecha devolucion alquiler no puede ser menor que la fecha de inicio de alquiler.") 
         
         except ValueError:
-            print("Fecha no valida")
+            print("Debes introducir numeros en la fecha")
+        except Exception:
+            print("Ocurrió un error en el proceso de devolucion de coche.")
             
     return alquiler
 
@@ -387,13 +408,13 @@ def menuAlquiler():
    
    #Cogemos los archivos en caso que existan
     try:
-        alquileresRaiz = ET.parse("Comercio_XML\\Comercio\\Alquileres\\alquileres.xml").getroot()
+        alquileresRaiz = ET.parse("Comercio\\Alquileres\\alquileres.xml").getroot()
     except:
         print("No existe el documento alquileres, lo creamos")
         alquileresRaiz = ET.Element('Alquileres')
 
     try:
-        raizDocumentoCoche = ET.parse("Comercio_XML\\Comercio\Coches\\coches.xml").getroot()
+        raizDocumentoCoche = ET.parse("Comercio\Coches\\coches.xml").getroot()
     except:
         print("No existe el documento coches")
         raizDocumentoCoche = Element('Coches')
@@ -412,7 +433,7 @@ def menuAlquiler():
         if(opcion == "1"):
             crearAlquiler(alquileresRaiz, raizDocumentoCoche)
         elif(opcion == "2"):
-            modificarAlquiler()
+            modificarAlquiler(alquileresRaiz)
         elif(opcion == "3"):
             consultaAlquiler(alquileresRaiz, raizDocumentoCoche)
         elif(opcion == "4"):

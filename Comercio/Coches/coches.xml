@@ -20,10 +20,4 @@
     <TarifaPorDia>3</TarifaPorDia>
     <Estado>disponible</Estado>
   </Coche>
-  <Coche id="4">
-    <Matricula>7777WWW</Matricula>
-    <Descripcion>
-      <Marca>Ford</Marca>
-    </Descripcion>
-  </Coche>
 </Coches>
