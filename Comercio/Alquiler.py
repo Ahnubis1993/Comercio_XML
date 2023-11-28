@@ -6,6 +6,16 @@ from datetime import datetime
 
 def guardarAlquiler(alquileresRaiz):
     
+    """
+    Guarda la estructura XML de alquileres en el archivo alquileres.xml.
+
+    Args:
+        alquileresRaiz (Element): El elemento raiz del documento XML de alquileres.
+
+    Returns:
+        None
+    """
+    
     file = open("Comercio\\Alquileres\\alquileres.xml", "w")
     archivoDefinido = prettify(alquileresRaiz)
     
@@ -21,6 +31,16 @@ def guardarAlquiler(alquileresRaiz):
 
 def prettify(elem):
     
+    """
+    Retorna una cadena XML con formato para el elemento.
+
+    Args:
+        elem (Element): El elemento XML que se formateara.
+
+    Returns:
+        str: Una cadena con formato XML facil de leer.
+    """
+    
     from xml.etree import ElementTree
     from xml.dom import minidom
     """Return a pretty-printed XML string for the Element.
@@ -30,6 +50,18 @@ def prettify(elem):
     return reparsed.toprettyxml(indent="  ")
 
 def crearAlquiler(alquileresRaiz, cochesRaiz):
+    
+    """
+    Crea un nuevo registro de alquiler en la estructura XML. 
+    Se debe buscar un coche para alquilarlo.
+
+    Args:
+        alquileresRaiz (Element): El elemento raiz que contiene la informacion de los alquileres.
+        cochesRaiz (Element): El elemento raiz que contiene la informacion de los coches.
+
+    Returns:
+        None
+    """
     
     if(len(cochesRaiz.findall('Coche'))>0):
     
@@ -72,7 +104,20 @@ def crearAlquiler(alquileresRaiz, cochesRaiz):
     else:
         print("No hay coches guardados. No se puede crear un alquiler sin un coche.")
 
-def obtenerIdCoche(cochesRaiz, alquiler): 
+def obtenerIdCoche(cochesRaiz, alquiler):
+    
+    """
+    Obtiene el ID de un coche para ser asignado a un alquiler.
+
+    Args:
+        cochesRaiz (Element): El elemento raiz que contiene la informacion de los coches.
+        alquiler (Element): El elemento de alquiler al que se asignara el ID del coche.
+
+    Returns:
+        Tuple[bool, Element]: Una tupla donde el primer elemento indica si la operacion fue exitosa y el segundo
+        elemento es el coche seleccionado. Si la operación no fue exitosa, el segundo elemento es None.
+    """
+    
     coche = buscarCoche(cochesRaiz, True)
     if(coche is not None): 
         if(coche.find('Estado').text=="disponible"):
