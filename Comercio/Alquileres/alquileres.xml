@@ -17,5 +17,6 @@
     <FechaInicioAlquiler>10/10/2023</FechaInicioAlquiler>
     <FechaFinalizacionAlquiler>30/10/2023</FechaFinalizacionAlquiler>
     <KmInicialAlquiler>10000</KmInicialAlquiler>
+    <Recargo>150</Recargo>
   </Alquiler>
 </Alquileres>
