@@ -168,10 +168,10 @@ def crearCoche(cochesRaiz):
         
         # Al final se pregunta si se quiere introducir otro coche independiente de si se ha dado de alta
         if(correcto):
-            print("\nAlta realizada correctamente")
+            print("\nAlta coche realizada correctamente")
         else:
             cochesRaiz.remove(coche)
-            print("\nAlta no realizada")
+            print("\nAlta coche no realizada")
         if(not confirmacion("Desea introducir otro coche? S/N: ")):
             fin = True
 
