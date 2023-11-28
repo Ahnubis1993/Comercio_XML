@@ -29,9 +29,9 @@ def prettify(elem):
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
 
-def crearAlquiler(alquileresRaiz, raizDocumentoCoche):#FIXME los nombres deberian ser similares
+def crearAlquiler(alquileresRaiz, cochesRaiz):
     
-    if(len(raizDocumentoCoche.findall('Coche'))>0):#FIXME no muestra nada si no hay coches
+    if(len(cochesRaiz.findall('Coche'))>0):
     
         fin = False
         while(not fin):
@@ -44,48 +44,46 @@ def crearAlquiler(alquileresRaiz, raizDocumentoCoche):#FIXME los nombres deberia
             
             #No hace falta comprobar 'correcto', aqui siempre sera True
             print("--- Buscando coche para asignar ID ---")
-            correcto, coche = obtenerIdCoche(raizDocumentoCoche, alquiler)
+            correcto, coche = obtenerIdCoche(cochesRaiz, alquiler)
 
             if(correcto):
-                correcto = obtenerDni(correcto, alquiler)
+                correcto = obtenerDni(alquiler)
                 
             if(correcto):
-                
-                correcto, fechaInicio = obtenerFechaInicio(correcto, alquiler)
+                correcto, fechaInicio = obtenerFechaInicio(alquiler)
     
             if(correcto):
-
-                correcto = obtenerFechaFinAlquiler(correcto, alquiler, fechaInicio)
+                correcto = obtenerFechaFinAlquiler(alquiler, fechaInicio)
                 
             if(correcto):
-                
-                correcto = obtenerKmInicial(correcto, alquiler)
+                correcto = obtenerKmInicial(alquiler)
 
-            if(correcto):
+            if(correcto):#TODO Dar la opcion de cancelar
                 #Si se da de alta el alquiler, cambiamos valor del vehiculo a alquilado
                 coche.find('Estado').text="alquilado"
-                if(not confirmacion("Alquiler realizado correctamente. Desea introducir otro alquiler? S/N: ")):
+                if(not confirmacion("Alquiler realizado correctamente. Desea introducir otro alquiler? (S/N): ")):
                     fin = True
             else:
-                if(not confirmacion("Alquiler no realizado con exito. Desea introducir otro alquiler? S/N: ")):
+                if(not confirmacion("Alquiler no realizado con exito. Desea introducir otro alquiler? (S/N): ")):
                     alquileresRaiz.remove(alquiler)
                     fin = True
 
             if (not correcto):
                 fin = True
+    else:
+        print("No hay coches guardados. No se puede crear un alquiler sin un coche.")
 
-def obtenerIdCoche(raizDocumentoCoche, alquiler): 
-    coche = buscarCoche(raizDocumentoCoche, True)
+def obtenerIdCoche(cochesRaiz, alquiler): 
+    coche = buscarCoche(cochesRaiz, True)
     if(coche is not None): 
         if(coche.find('Estado').text=="disponible"):
             id = coche.get('id')
-            idNum = int(id)
-            idAlquilerXML = ET.SubElement(alquiler, 'IDCoche')
-            idAlquilerXML.text = str(idNum)
+            idCocheXML = ET.SubElement(alquiler, 'IDCoche')
+            idCocheXML.text = id
             correcto = True
         else:
             correcto = False
-            print("El coche debe estar disponible")
+            print("Este coche no esta disponible para alquilar")
     else:
         correcto = False
         print("Busqueda de coche no realizada")
@@ -93,29 +91,25 @@ def obtenerIdCoche(raizDocumentoCoche, alquiler):
     return correcto, coche
         
       
-def obtenerDni(correcto, alquiler):  
+def obtenerDni(alquiler):  
     
     intentos = 3
     correcto = False
     
     while(not correcto and intentos>0):
         dni = input("\nIntroduce el DNI del alquiler: ").strip().upper()
-        if(dni.isalnum and len(dni) == 9):
-            numero = dni[:8]
-            letras = dni[8]
-            if(numero.isdigit() and letras.isalpha):
-                dniXML = ET.SubElement(alquiler, 'DNI')
-                dniXML.text = str(dni)
-                correcto = True
-                print("DNI valido")
-            else:
-                print("Formato DNI no valido")
+        if(len(dni) == 9 and dni[:8].isdigit() and dni[8].isalpha):
+            dniXML = ET.SubElement(alquiler, 'DNI')
+            dniXML.text = dni
+            correcto = True
+            print("DNI valido")
         else:
-            print("DNI no valido")
+            print("El formato del DNI no es valido")
+        intentos -= 1
     return correcto
         
 
-def obtenerFechaInicio(correcto, alquiler):
+def obtenerFechaInicio(alquiler):
     
     intentos = 3
     correcto = False
@@ -128,25 +122,25 @@ def obtenerFechaInicio(correcto, alquiler):
             anio = int(input("Introduce el año: "))
             
             # Formar la fecha y verificar su validez
-            fechaInicio = f"{dia:02d}/{mes:02d}/{anio}"
-            fecha = datetime.strptime(fechaInicio, '%d/%m/%Y')
-            fecha_formateada = fecha.strftime('%d/%m/%Y')
+            fechaInput = f"{dia:02d}/{mes:02d}/{anio}"
+            fechaInicio = datetime.strptime(fechaInput, '%d/%m/%Y')
+            fechaFormateada = fechaInicio.strftime('%d/%m/%Y')
                 
-            if(fechaInicio==fecha_formateada):
+            if(fechaInput==fechaFormateada):#Si los dias y los meses han sido validos para una fecha
                 fechaInicioXML = ET.SubElement(alquiler, 'FechaInicioAlquiler')
-                fechaInicioXML.text = fechaInicio
+                fechaInicioXML.text = fechaInput
                 correcto = True
                 print("Fecha de inicio alquiler valida")
             else:
                 print("Formato Fecha inicio alquiler no valido")
         except ValueError:
             print("Fecha no valida")
-        intentos = intentos - 1 
+        intentos -= 1
     
     return correcto, fechaInicio
     
 
-def obtenerFechaFinAlquiler(correcto, alquiler, fechaInicio):
+def obtenerFechaFinAlquiler(alquiler, fechaInicio):
     
     intentos = 3
     correcto = False
@@ -159,43 +153,40 @@ def obtenerFechaFinAlquiler(correcto, alquiler, fechaInicio):
             anio = int(input("Introduce el año: "))
             
             # Formar la fecha y verificar su validez
-            fechaFin = f"{dia:02d}/{mes:02d}/{anio}"
-            fecha = datetime.strptime(fechaFin, '%d/%m/%Y')
-            fecha_formateada = fecha.strftime('%d/%m/%Y')
-            fechaInicio_dt = datetime.strptime(fechaInicio, '%d/%m/%Y')
-            if fechaFin == fecha_formateada and fechaInicio_dt < fecha:
+            fechaInput = f"{dia:02d}/{mes:02d}/{anio}"
+            fechaFin = datetime.strptime(fechaInput, '%d/%m/%Y')
+            fechaFormateada = fechaFin.strftime('%d/%m/%Y')
+            if (fechaInput == fechaFormateada and fechaInicio < fechaFin):
                 fechaFinXML = ET.SubElement(alquiler, 'FechaFinalizacionAlquiler')
-                fechaFinXML.text = fechaFin
+                fechaFinXML.text = fechaInput
                 correcto = True
                 print("Fecha de finalización de alquiler válida")
+            elif (fechaInput != fechaFormateada):
+                print("La fecha de finalización de alquiler no coincide con el formato esperado.")
             else:
-                if fechaFin != fecha_formateada:
-                    print("La fecha de finalización de alquiler no coincide con el formato esperado.")
-                else:
-                    print("La fecha de finalización de alquiler no puede ser menor que la fecha de inicio de alquiler.") 
-        
+                print("La fecha de finalización de alquiler no puede ser anterior a que la fecha de inicio de alquiler.") 
         except ValueError:
             print("Fecha no valida")
-        intentos = intentos - 1
+        intentos -= 1
     
     return correcto
                  
      
-def obtenerKmInicial(correcto, alquiler):
+def obtenerKmInicial(alquiler):
 
     intentos = 3
     correcto = False
 
     while(not correcto and intentos>0):
-        kmInicial = input("Introduce el km inicial alquiler - (km): ")
+        kmInicial = input("Introduce el km inicial del coche - (km): ")
         if(kmInicial.isdigit()):
             kmXML = ET.SubElement(alquiler, 'KmInicialAlquiler')
-            kmXML.text = str(kmInicial)
+            kmXML.text = kmInicial
             correcto = True
-            print("Km_Inicial introducido correctamente")
+            print("Km inicial introducido correctamente")
         else:
             print("Km debe ser un numero")
-        intentos = intentos - 1
+        intentos -= 1
     
     return correcto  
                      
@@ -238,7 +229,7 @@ def busquedaAlquiler(alquileresRaiz):
             
     return alquiler 
 
-def devolverCoche(alquileresRaiz, raizDocumentoCoche):
+def devolverCoche(alquileresRaiz, cochesRaiz):
     print("--- Devolviendo Coche ---")
     alquiler = busquedaAlquiler(alquileresRaiz)
         #O se hace todo o nada
@@ -260,7 +251,7 @@ def devolverCoche(alquileresRaiz, raizDocumentoCoche):
             
             #obtengo coche por ID_Coche de alquiler para recoger su tarifa diaria
             idCocheAlquiler = alquiler.find('IDCoche').text
-            coche = raizDocumentoCoche.find(f"Coche[@id='{idCocheAlquiler}']")
+            coche = cochesRaiz.find(f"Coche[@id='{idCocheAlquiler}']")
             
             #dias diferencia por la tarifa que tenga dicho coche + recargo (si hay)
             tarifaFinal = diasDiferencia*int(coche.find('TarifaPorDia').text)
@@ -349,7 +340,7 @@ def obtenerKmFinal(alquiler):
             
     return alquiler
 
-def consultaAlquiler(alquileresRaiz, raizDocumentoCoche):
+def consultaAlquiler(alquileresRaiz, cochesRaiz):
     fin = False 
     while(fin == False):
         print("\n---- Menu Consulta ----\n")
@@ -373,7 +364,7 @@ def consultaAlquiler(alquileresRaiz, raizDocumentoCoche):
             #se pone en mayus porque las letras de la matricual del coche estan en mayus
             matricula = input("Introduce la matricula del coche: ").strip().upper()
             #itera los coches y busca la matricula introducida
-            cochesMatricula = [coche for coche in raizDocumentoCoche.findall('Coche') if coche.find('Matricula').text == matricula]
+            cochesMatricula = [coche for coche in cochesRaiz.findall('Coche') if coche.find('Matricula').text == matricula]
 
             if(cochesMatricula):
                 for alquiler in alquileresRaiz:
@@ -414,10 +405,10 @@ def menuAlquiler():
         alquileresRaiz = ET.Element('Alquileres')
 
     try:
-        raizDocumentoCoche = ET.parse("Comercio\Coches\\coches.xml").getroot()
+        cochesRaiz = ET.parse("Comercio\Coches\\coches.xml").getroot()
     except:
         print("No existe el documento coches")
-        raizDocumentoCoche = Element('Coches')
+        cochesRaiz = Element('Coches')
 
     
     fin = False 
@@ -431,16 +422,16 @@ def menuAlquiler():
         opcion = input("Elige una opcion: ")
         
         if(opcion == "1"):
-            crearAlquiler(alquileresRaiz, raizDocumentoCoche)
+            crearAlquiler(alquileresRaiz, cochesRaiz)
         elif(opcion == "2"):
             modificarAlquiler(alquileresRaiz)
         elif(opcion == "3"):
-            consultaAlquiler(alquileresRaiz, raizDocumentoCoche)
+            consultaAlquiler(alquileresRaiz, cochesRaiz)
         elif(opcion == "4"):
-            devolverCoche(alquileresRaiz, raizDocumentoCoche)
+            devolverCoche(alquileresRaiz, cochesRaiz)
         elif(opcion == "0"):
             #Se gurdan coches tambien por los posibles cambios del elemento 'Estado' del coche
-            guardarCoches(raizDocumentoCoche)
+            guardarCoches(cochesRaiz)
             guardarAlquiler(alquileresRaiz)
             fin = True
             print("Vuelta Menu Principal")
