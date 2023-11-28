@@ -393,8 +393,9 @@ def busquedaAlquiler(alquileresRaiz):
                 finIdAlquiler = False
                 while(not finIdAlquiler):
                     idAlquiler = input("Introduce id del alquiler a elegir")
-                    alquiler = [alquiler for alquiler in alquileres if alquiler.get('id') == idAlquiler]
-                    if(alquiler is not None):
+                    alquileresId = [alquiler for alquiler in alquileres if alquiler.get('id') == idAlquiler]
+                    if(alquileresId is not None):
+                        alquiler = alquileresId[0]
                         finIdAlquiler = True
                     else:
                         print("Introduce un identificador de alquiler valido")
@@ -405,7 +406,7 @@ def busquedaAlquiler(alquileresRaiz):
     else:
         print("No hay alquileres registrados")
             
-    return alquiler[0]
+    return alquiler
 
 def devolverCoche(alquileresRaiz, cochesRaiz):
     
@@ -457,6 +458,9 @@ def devolverCoche(alquileresRaiz, cochesRaiz):
                     
                     #cambio estado a disponible al final, cuando se ha creado la tarifa
                     coche.find('Estado').text="disponible" 
+                    print("La tarifa final del coche ha sido ", alquiler.find('TarifaFinal').text, "€.")
+                    if(alquiler.find('Recargo') is not None):
+                        print("Incluido el recargo de", alquiler.find('Recargo').text, "€ por devolver el coche despues de la fecha de finalizacion")
                 #si se ha introducido la fecha pero no los km, destruye el objeto y sale
                 else:
                     alquiler.remove(alquiler.find('FechaDevolucionAlquiler'))
@@ -556,7 +560,7 @@ def obtenerKmFinal(alquiler):
     
     correcto = False
     intentos = 3
-    kmInicial = alquiler.find('FechaInicioAlquiler').text
+    kmInicial = alquiler.find('KmInicialAlquiler').text
     while(not correcto and intentos>0):
         kmFinal = input("Introduce km final alquiler - (km): ")
         if(kmFinal.isdigit()):

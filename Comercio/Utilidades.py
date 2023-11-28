@@ -13,7 +13,7 @@ def confirmacion(mensaje):
     salir = False
     eleccion = False
     while(not salir):
-        respuesta = input(mensaje).lower()
+        respuesta = input(mensaje).strip().lower()
         if(respuesta.startswith("s")):
             eleccion = True
             salir = True

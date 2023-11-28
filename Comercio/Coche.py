@@ -198,14 +198,14 @@ def eliminarCoche(cochesRaiz):
     coche=buscarCoche(cochesRaiz, True)
     if(coche is not None):
         #no se puede eliminar un coche que se encuentra en alquiler o en el taller
-        if(coche.find('Estado').text != "disponible" and coche.find('Estado').text!= "en taller"):
+        if(coche.find('Estado').text == "disponible" and coche.find('Estado').text== "en taller"):
             if(confirmacion("Estas seguro que deseas eliminar el coche con matricula '"+coche[0].text+"' (S/N)")):
                 cochesRaiz.remove(coche)
                 print("\nCoche eliminado exitosamente.")
             else:
                 print("La eliminacion del coche ha sido cancelada")
         else:
-            print("Un coche que se encuentra en alquiler o en el taller no puede ser eliminado")
+            print("Un coche que se encuentra en alquiler no puede ser eliminado")
     else:
         print("Borrado de coche ha sido cancelado")
     
@@ -294,8 +294,9 @@ def buscarCoche(cochesRaiz, devolverUnico):
                     salirId = False
                     while(not salirId):
                         idCoche = input("Introduce numero de coche a buscar: ").strip()
-                        cocheDevuelto = [coche for coche in cochesEncontrados if(coche.get("id") == idCoche)]#FIXME
-                        if (cocheDevuelto is not None):
+                        cocheIdConseguido = [coche for coche in cochesEncontrados if(coche.get("id") == idCoche)]#FIXME
+                        if (cocheIdConseguido is not None):
+                            cocheDevuelto=cocheIdConseguido[0]
                             cancelar = True
                             salirId = True
                         else:
@@ -309,7 +310,7 @@ def buscarCoche(cochesRaiz, devolverUnico):
     else:   # sale si no hay coches que buscar
         print("No hay coche en la base de datos")
         
-    return cocheDevuelto[0]
+    return cocheDevuelto
 
 
 def modificarCoche(cochesRaiz):  
@@ -409,7 +410,7 @@ def modificarCoche(cochesRaiz):
                     print(nuevoEstado,"no es un estado valido.")
             elif(opcion=="0"):
                 cancelado = True
-                print("\nModificacion cancelada")
+                print("Modificacion cancelada")
             else:
                 print("Opcion incorrecta")
              
@@ -505,7 +506,7 @@ def repetido(cochesRaiz, matricula):
     
     repetido = False
     for coche in cochesRaiz:
-        if(coche.find('matricula') is not None and coche[0].text==matricula):
+        if(coche.find('Matricula').text==matricula):
             repetido=True
     
     return repetido
