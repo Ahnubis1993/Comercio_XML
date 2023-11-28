@@ -73,8 +73,11 @@ def crearCoche(cochesRaiz):
         # 1 Subelemento Coche
         # Se busca el id del ultimo coche para incrementarlo para el nuevo coche
         ultimoCoche = cochesRaiz.find(".//Coche[last()]")
-        ultimoId = int(ultimoCoche.get("id"))
-        coche = ET.SubElement(cochesRaiz, 'Coche', {'id':str(ultimoId+1)})
+        if (ultimoCoche is not None):
+            ultimoId = int(ultimoCoche.get("id"))
+            coche = ET.SubElement(cochesRaiz, 'Coche', {'id':str(ultimoId+1)})
+        else:
+            coche = ET.SubElement(cochesRaiz, 'Coche', {'id':"1"})
         print("* Creando nuevo coche *")
         
         while(intentos>0 and not correcto):
@@ -86,8 +89,8 @@ def crearCoche(cochesRaiz):
                 letras = matricula[4:]
                 if(numeros.isdigit() and letras.isalpha()):
                     # Compruebo que no este repetida, que lea en mayus, ya que los insertamos en mayus
+                    matriculaXML = ET.SubElement(coche, 'Matricula')
                     if(not repetido(cochesRaiz, matricula.upper())):
-                        matriculaXML = ET.SubElement(coche, 'Matricula')
                         matriculaXML.text = matricula.upper()
                         print("Matricula correcta")
                         correcto = True
@@ -505,10 +508,14 @@ def repetido(cochesRaiz, matricula):
     """
     
     repetido = False
-    for coche in cochesRaiz:
-        if(coche.find('Matricula').text==matricula):
-            repetido=True
+    longitudCoches = len(cochesRaiz)
     
+    if(longitudCoches>1):
+        for coche in cochesRaiz:
+            if(coche is not None):
+                if(coche.find('Matricula').text==matricula):
+                    repetido=True
+        
     return repetido
 
 
