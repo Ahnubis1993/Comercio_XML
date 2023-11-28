@@ -5,12 +5,13 @@ from Utilidades import confirmacion
 def guardarCoches(cochesRaiz):
     
     """
-    menu que usa los
+    Guarda la estructura XML completa en el fichero coches.xml.
 
-    :param name: The name of the person to greet.
-    :type name: str
-    :return: A greeting message.
-    :rtype: str
+    Args:
+        cochesRaiz (Element): El elemento raiz XML de los coches que seran guardados.
+    
+    Returns:
+        None
     """
     
     file = open("Comercio\\Coches\\coches.xml", "w")
@@ -26,15 +27,17 @@ def guardarCoches(cochesRaiz):
     file.writelines(textoCorreecto)
     file.close()
 
+
 def prettify(elem):
     
     """
-    menu que usa los
+    Retorna una cadena XML con formato para el elemento.
 
-    :param name: The name of the person to greet.
-    :type name: str
-    :return: A greeting message.
-    :rtype: str
+    Args:
+        elem (Element): El elemento XML que se formateara.
+
+    Returns:
+        str: Una cadena con formato XML facil de leer.
     """
     
     from xml.etree import ElementTree
@@ -45,16 +48,18 @@ def prettify(elem):
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
 
-# Hecho
+
 def crearCoche(cochesRaiz):
     
     """
-    menu que usa los
+    Crea un nuevo coche en la estructura XML. Pide al usuario que introduzca la Matricula, 
+    Marca, Modelo, Anio de fabricacion y Tarifa por dia.
 
-    :param name: The name of the person to greet.
-    :type name: str
-    :return: A greeting message.
-    :rtype: str
+    Args:
+        cochesRaiz (Element): El elemento raiz que contiene la informacion de los coches.
+    
+    Returns:
+        None
     """
     
     print("\n--- Alta Coche ---")
@@ -175,8 +180,20 @@ def crearCoche(cochesRaiz):
         if(not confirmacion("Desea introducir otro coche? S/N: ")):
             fin = True
 
-# Hecho
+
 def eliminarCoche(cochesRaiz):
+    
+    """
+    Elimina un registro de coche de la estructura XML. Invoca la funcion buscar para que 
+    devuelva un unico coche y pregunta confirmacion al usuario
+
+    Args:
+        cochesRaiz (Element): El elemento raiz que contiene la informacion de los coches.
+
+    Returns:
+        None
+    """
+    
     print("\n--- Eliminar Coche ---")
     coche=buscarCoche(cochesRaiz, True)
     if(coche is not None):
@@ -192,15 +209,20 @@ def eliminarCoche(cochesRaiz):
     else:
         print("Borrado de coche ha sido cancelado")
     
+    
 def buscarCoche(cochesRaiz, devolverUnico):
     
     """
-    menu que usa los
+    Busca coches en la estructura XML. Permite buscar por cualquier parametro.
+    La busqueda es difusa para todos los campos excepto Matricula y no es case sensitive.
 
-    :param name: The name of the person to greet.
-    :type name: str
-    :return: A greeting message.
-    :rtype: str
+    Args:
+        cochesRaiz (Element): El elemento raiz que contiene la informacion de los coches.
+        devolverUnico (bool): Indica si se debe devolver un unico coche (True) o una lista de coches (False).
+
+    Returns:
+        None: Si no se encuentra ningún coche o si devolverUnico es False
+        Element: Si se encuentra un coche y devolverUnico es True.
     """
     
     cochesEncontrados = []
@@ -289,17 +311,19 @@ def buscarCoche(cochesRaiz, devolverUnico):
     return cocheDevuelto
 
 
-def modificarCoche(cochesRaiz):
-    
+def modificarCoche(cochesRaiz):  
+
     """
-    menu que usa los
+    Modifica un campo de un coche encontrado por la funcion buscarCoche.
+    El usuario puede elegir que campo modificar y se le pide confirmacion.
 
-    :param name: The name of the person to greet.
-    :type name: str
-    :return: A greeting message.
-    :rtype: str
-    """    
+    Args:
+        cochesRaiz (Element): El elemento raiz que contiene la informacion de los coches.
 
+    Returns:
+        None
+    """
+    
     print("\n--- Modificacion Coche ---")
     coche = buscarCoche(cochesRaiz, True)
    
@@ -391,16 +415,18 @@ def modificarCoche(cochesRaiz):
     else:
         print("Modificacion cancelada")
     
-# Hecho
+    
 def mostrarCoches(cochesRaiz, coche):
     
     """
-    menu que usa los
+    Muestra los coches del elemento XML. Muestra solo un coche si lo recibe por parametro
 
-    :param name: The name of the person to greet.
-    :type name: str
-    :return: A greeting message.
-    :rtype: str
+    Args:
+        cochesRaiz (Element): El elemento raiz que contiene la informacion de los coches que se mostraran.
+        coche (Element): El coche especifico que se desea mostrar. Si es None, se muestran todos los coches.
+
+    Returns:
+        None
     """
     
     if(coche is None):
@@ -435,12 +461,10 @@ def mostrarCoches(cochesRaiz, coche):
 def menuAtributos():
     
     """
-    menu que usa los
+    Muestra un menu de atributos de coche y solicita al usuario que elija una opcion.
 
-    :param name: The name of the person to greet.
-    :type name: str
-    :return: A greeting message.
-    :rtype: str
+    Returns:
+        str: La opción elegida por el usuario (del '0' al '6').
     """
     
     fin = False
@@ -464,12 +488,14 @@ def menuAtributos():
 def repetido(cochesRaiz, matricula):
     
     """
-    menu que usa los
+    Verifica si una matricula dada ya esta registrada en la estructura XML de coches.
 
-    :param name: The name of the person to greet.
-    :type name: str
-    :return: A greeting message.
-    :rtype: str
+    Args:
+        cochesRaiz (Element): El elemento raiz que contiene la informacion de los coches.
+        matricula (str): La matricula que se desea verificar.
+
+    Returns:
+        bool: True si la matricula esta repetida, False si no lo esta.
     """
     
     repetido = False
@@ -483,12 +509,10 @@ def repetido(cochesRaiz, matricula):
 def menuCoches():  
     
     """
-    menu que usa los
+    Menu principal para realizar operaciones con la informacion de coches.
 
-    :param name: The name of the person to greet.
-    :type name: str
-    :return: A greeting message.
-    :rtype: str
+    Returns:
+        None
     """
     
     try:
