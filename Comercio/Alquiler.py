@@ -58,18 +58,16 @@ def crearAlquiler(alquileresRaiz, cochesRaiz):
             if(correcto):
                 correcto = obtenerKmInicial(alquiler)
 
-            #Si no se desea crear el alta, accede a la condicion else y pide introducir otro alquiler
+            #Si se ha creado toto correctamente y confirmas la creacion
             if(correcto and confirmacion("Estas seguro que deseas crear el alquiler? (S/N): ")):
                     #Si se da de alta el alquiler, cambiamos valor del vehiculo a alquilado
                     coche.find('Estado').text="alquilado"
-                    if(not confirmacion("Alquiler realizado correctamente. Desea introducir otro alquiler? (S/N): ")):
-                            fin = True
+                    print("Alta alquiler realizada correctamente")        
             else:
-                if(not confirmacion("Alquiler no realizado con exito. Desea introducir otro alquiler? (S/N): ")):
-                    alquileresRaiz.remove(alquiler)
-                    fin = True
+                alquileresRaiz.remove(alquiler)
+                print("Alta alquiler no realiza")
 
-            if (not correcto):#FIXME verifciar si tiene alguna funcion o ya se hace en confirmaciones
+            if(not confirmacion("Desea introducir otro alquiler? (S/N): ")):
                 fin = True
     else:
         print("No hay coches guardados. No se puede crear un alquiler sin un coche.")
@@ -116,6 +114,7 @@ def obtenerFechaInicio(alquiler):
     correcto = False
 
     while(not correcto and intentos>0):
+        fechaInicio = None
         print("Fecha de inicio alquiler")
         try:
             dia = int(input("Introduce el día: "))
@@ -123,7 +122,7 @@ def obtenerFechaInicio(alquiler):
             anio = int(input("Introduce el año: "))
             
             # Formar la fecha y verificar su validez
-            fechaInput = f"{dia:02d}/{mes:02d}/{anio}"
+            fechaInput = f"{dia:02d}/{mes:02d}/{anio:04d}"
             fechaInicio = datetime.strptime(fechaInput, '%d/%m/%Y')
             fechaFormateada = fechaInicio.strftime('%d/%m/%Y')
                 
@@ -154,7 +153,7 @@ def obtenerFechaFinAlquiler(alquiler, fechaInicio):
             anio = int(input("Introduce el año: "))
             
             # Formar la fecha y verificar su validez
-            fechaInput = f"{dia:02d}/{mes:02d}/{anio}"
+            fechaInput = f"{dia:02d}/{mes:02d}/{anio:04d}"
             fechaFin = datetime.strptime(fechaInput, '%d/%m/%Y')
             fechaFormateada = fechaFin.strftime('%d/%m/%Y')
             if (fechaInput == fechaFormateada and fechaInicio < fechaFin):
@@ -191,35 +190,78 @@ def obtenerKmInicial(alquiler):
     
     return correcto  
                      
-def modificarAlquiler(alquileresRaiz): #TODO
+def modificarAlquiler(alquileresRaiz):
     print("--- Modificacion Alquiler ---")
     alquiler = busquedaAlquiler(alquileresRaiz)
-    finModificar = False
-    while(not finModificar):
-        
-        print("Elige una opcion para modificar el alquiler: ")
-        print("1 - Fecha de inicio alquiler")
-        print("2 - Fecha de finalización alquiler")
-        opcion = input("Introduce la opcion a modificar: ")
-        
-        if(opcion== "1"):#TODO si se modifica la fecha inicial, deberia modificarse la fecha final si o si
-            dia = int(input("Introduce el día: "))
-            mes = int(input("Introduce el mes (numerico): "))
-            anio = int(input("Introduce el año: "))
+    if(alquiler is not None):
+        finModificar = False
+        while(not finModificar):
             
-            # Formar la fecha y verificar su validez
-            fechaInput = f"{dia:02d}/{mes:02d}/{anio}"
-            fechaFin = datetime.strptime(fechaInput, '%d/%m/%Y')
-            fechaFormateada = fechaFin.strftime('%d/%m/%Y')
-            
-        elif(opcion== "2"):
-            nuevaFechaFinalizacion = input("Introduce la nueva fecha de finalización alquiler: ")
-        elif(opcion== "0"):
-            finModificar = True
-            print("Fin modificacion")
-        else:
-            print("Opcion no valida")
+            #cogemos fechas del alquiler para comparar
+            fechaInicio = alquiler.find('FechaInicioAlquiler').text.split("/")
+            fechaInputInicio = f"{int(fechaInicio[0]):02d}/{int(fechaInicio[1]):02d}/{int(fechaInicio[2]):04d}"
+            fechaInicioFormateDate= datetime.strptime(fechaInputInicio, '%d/%m/%Y')
         
+            fechaFinalizacion = alquiler.find('FechaFinalizacionAlquiler').text.split("/")
+            fechaInputFinalizacion = f"{int(fechaFinalizacion[0]):02d}/{int(fechaFinalizacion[1]):02d}/{int(fechaFinalizacion[2]):04d}"
+            fechaFinalizacionFormatoDate= datetime.strptime(fechaInputFinalizacion, '%d/%m/%Y')
+                
+            print("Elige una opcion para modificar el alquiler: ")
+            print("1 - Fecha de inicio alquiler")
+            print("2 - Fecha de finalización alquiler")
+            opcion = input("Introduce la opcion a modificar: ")
+            
+            if(opcion== "1"):#TODO si se modifica la fecha inicial, deberia modificarse la fecha final si o si
+                
+                dia = int(input("Introduce el día: "))
+                mes = int(input("Introduce el mes (numerico): "))
+                anio = int(input("Introduce el año: "))
+                
+                # Formar la fecha y verificar su validez
+                fechaInicioNueva= f"{dia:02d}/{mes:02d}/{anio:04d}"
+                fechaInicioNuevaDate = datetime.strptime(fechaInicioNueva, '%d/%m/%Y')
+                fechaInicioNuevaFormato = fechaInicioNuevaDate.strftime('%d/%m/%Y')
+                
+                #que tenga formato y que la fecha finalizacion sea mayor a la nueva de inicio
+                if(fechaInicioNueva==fechaInicioNuevaFormato and fechaFinalizacionFormatoDate>fechaInicioNuevaDate):
+                    alquiler.find('FechaInicioAlquiler').text = fechaInicioNueva
+                    print("Fecha de inicio introducida correctamente")
+                elif(fechaInicioNueva!=fechaInicioNuevaFormato):
+                    print("Formato de fecha introducido no valido")
+                else:
+                    print("La fecha de inicio de alquiler no puede ser anterior a que la fecha de finalizacion")
+                    
+                
+            elif(opcion== "2"):
+                
+                dia = int(input("Introduce el día: "))
+                mes = int(input("Introduce el mes (numerico): "))
+                anio = int(input("Introduce el año: "))
+                
+                # Formar la fecha y verificar su validez
+                fechaFinNueva= f"{dia:02d}/{mes:02d}/{anio:04d}"
+                fechaFinNuevaDate = datetime.strptime(fechaFinNueva, '%d/%m/%Y')
+                fechaFinNuevaFormato = fechaFinNuevaDate.strftime('%d/%m/%Y')
+                
+                #que tenga formato y que la fecha finalizacion sea mayor a la nueva de inicio
+                if(fechaFinNueva==fechaFinNuevaFormato and fechaInicioFormateDate<fechaFinNuevaDate):
+                    alquiler.find('FechaFinalizacionAlquiler').text = fechaFinNueva
+                    print("Fecha de finalización introducida correctamente")
+                elif(fechaFinNueva!=fechaFinNuevaFormato):
+                    print("Formato de fecha introducido no valido")
+                else:
+                    print("La fecha de finalizacion de alquiler debe ser mayor que la fecha de inicio")
+                    
+            elif(opcion== "0"):
+                finModificar = True
+                print("Fin modificacion")
+            else:
+                print("Opcion no valida")
+                
+            if(not finModificar):
+                 if(not confirmacion("Quieres modificar algo mas de este alquiler? S/N")):
+                     finModificar = True
+                     print("\n--- Has terminado de modificar el alquiler actual ---")   
 
 def busquedaAlquiler(alquileresRaiz):
     alquiler = None
@@ -314,20 +356,20 @@ def obtenerFechaDevolucion(alquiler):
             anio = int(input("Introduce el año: "))
             
             # Formar la fecha y verificar su validez
-            fechaInput = f"{dia:02d}/{mes:02d}/{anio}"
+            fechaInput = f"{dia:02d}/{mes:02d}/{anio:04d}"
             fechaDevolucion = datetime.strptime(fechaInput, '%d/%m/%Y')
             fecha_formateada = fechaDevolucion.strftime('%d/%m/%Y')
             
             #divido la fechaInicioaAlquiler para formartearla a fecha y comparar
             fechaI = alquiler.find('FechaInicioAlquiler').text.split('/')
             #creamos formato dd/mm/aaaa
-            fechaInicio = f"{int(fechaI[0]):02d}/{int(fechaI[1]):02d}/{int(fechaI[2])}"
+            fechaInicio = f"{int(fechaI[0]):02d}/{int(fechaI[1]):02d}/{int(fechaI[2]):04d}"
             #y lo hacemos datatime para poder comparar fechas
             fechaInicioFormato = datetime.strptime(fechaInicio, '%d/%m/%Y')
             
             #misma funcion que fechaInicio
             fechaF = alquiler.find('FechaFinalizacionAlquiler').text.split('/')
-            fechaFinali = f"{int(fechaF[0]):02d}/{int(fechaF[1]):02d}/{int(fechaF[2])}"
+            fechaFinali = f"{int(fechaF[0]):02d}/{int(fechaF[1]):02d}/{int(fechaF[2]):04d}"
             fechaFinalizacionFormato = datetime.strptime(fechaFinali, '%d/%m/%Y')
             
             #la fecha devolucion no puede ser menor que la fecha de inicio de alquiler
