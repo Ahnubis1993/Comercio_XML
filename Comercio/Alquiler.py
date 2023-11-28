@@ -97,7 +97,7 @@ def crearAlquiler(alquileresRaiz, cochesRaiz):
                     print("Alta alquiler realizada correctamente")        
             else:
                 alquileresRaiz.remove(alquiler)
-                print("Alta alquiler no realiza")
+                print("Alta del alquiler no realizada")
 
             if(not confirmacion("Desea introducir otro alquiler? (S/N): ")):
                 fin = True
@@ -151,7 +151,7 @@ def obtenerDni(alquiler):
     correcto = False
     
     while(not correcto and intentos>0):
-        dni = input("\nIntroduce el DNI del alquiler: ").strip().upper()
+        dni = input("\nIntroduce el DNI del propietario del alquiler: ").strip().upper()
         if(len(dni) == 9 and dni[:8].isdigit() and dni[8].isalpha):
             dniXML = ET.SubElement(alquiler, 'DNI')
             dniXML.text = dni
@@ -375,7 +375,7 @@ def busquedaAlquiler(alquileresRaiz):
     
     alquiler = None
     if(len(alquileresRaiz.findall('Alquiler')) > 0):
-        dni = input("Introduce el DNI del alquiler: ").strip().upper()
+        dni = input("Introduce el DNI del propietario del alquiler: ").strip().upper()
         #buscamos los alquiler con el Dni introducido, obviando los ya entregados
         alquileres = [alquiler for alquiler in alquileresRaiz if alquiler.find('DNI').text == dni and alquiler.find('TarifaFinal') is None]
         
@@ -405,7 +405,7 @@ def busquedaAlquiler(alquileresRaiz):
     else:
         print("No hay alquileres registrados")
             
-    return alquiler 
+    return alquiler[0]
 
 def devolverCoche(alquileresRaiz, cochesRaiz):
     
@@ -537,8 +537,12 @@ def obtenerFechaDevolucion(alquiler):
         except ValueError:
             print("Debes introducir numeros en la fecha")
         except Exception:
+<<<<<<< Updated upstream
             print("Ocurrió un error en el proceso de devolucion de coche.")
         intentos -= 1
+=======
+            print("Ocurrio un error en el proceso de devolucion de coche.")
+>>>>>>> Stashed changes
             
     return alquiler, correcto
 
@@ -648,6 +652,7 @@ def menuAlquiler():
     """
     Funcion principal que gestiona el menu de operaciones relacionadas con los alquileres.
     La funcion interactua con el usuario y realiza acciones en funcion de la opcion seleccionada.
+    Al salir del menu se guardan los alquileres y los coches en los ficheros.
 
     Args:
         None
@@ -689,7 +694,7 @@ def menuAlquiler():
         elif(opcion == "4"):
             devolverCoche(alquileresRaiz, cochesRaiz)
         elif(opcion == "0"):
-            #Se gurdan coches tambien por los posibles cambios del elemento 'Estado' del coche
+            #Se gurdan los alquileres y los coches tambien por los posibles cambios del elemento 'Estado' del coche
             guardarCoches(cochesRaiz)
             guardarAlquiler(alquileresRaiz)
             fin = True

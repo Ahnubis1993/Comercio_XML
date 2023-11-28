@@ -84,7 +84,7 @@ def crearCoche(cochesRaiz):
             if(len(matricula) == 7):
                 numeros = matricula[:4]
                 letras = matricula[4:]
-                if(numeros.isdigit and letras.isalpha):
+                if(numeros.isdigit() and letras.isalpha()):
                     # Compruebo que no este repetida, que lea en mayus, ya que los insertamos en mayus
                     if(not repetido(cochesRaiz, matricula.upper())):
                         matriculaXML = ET.SubElement(coche, 'Matricula')
@@ -107,7 +107,7 @@ def crearCoche(cochesRaiz):
             intentos = 3
             correcto = False
              
-            # 1.2.1 Subelement modelo
+            # 1.2.1 Subelement marca
             while(intentos>0 and not correcto):
                 marca = input("\nIntroduce marca: ").strip()
                 if (marca != ""):
@@ -230,6 +230,7 @@ def buscarCoche(cochesRaiz, devolverUnico):
     cancelar = False
     if(len(cochesRaiz.findall('Coche'))>0):
         while(not cancelar):
+            print("--- Busqueda de coches ---")
             opcion = menuAtributos()
 
             if(opcion == "1"):
@@ -293,7 +294,7 @@ def buscarCoche(cochesRaiz, devolverUnico):
                     salirId = False
                     while(not salirId):
                         idCoche = input("Introduce numero de coche a buscar: ").strip()
-                        cocheDevuelto = [coche for coche in cochesEncontrados if(coche.get("id") == idCoche)]
+                        cocheDevuelto = [coche for coche in cochesEncontrados if(coche.get("id") == idCoche)]#FIXME
                         if (cocheDevuelto is not None):
                             cancelar = True
                             salirId = True
@@ -308,7 +309,7 @@ def buscarCoche(cochesRaiz, devolverUnico):
     else:   # sale si no hay coches que buscar
         print("No hay coche en la base de datos")
         
-    return cocheDevuelto
+    return cocheDevuelto[0]
 
 
 def modificarCoche(cochesRaiz):  
@@ -340,7 +341,7 @@ def modificarCoche(cochesRaiz):
                     if(numeros.isdigit() and letras.isalpha):
                         if(not repetido(cochesRaiz, nuevaMatricula)):
                             if(confirmacion("Estas seguro de que deseas modificar la matricula? (S/N): ")):
-                                coche.find('matricula').text = nuevaMatricula
+                                coche.find('Matricula').text = nuevaMatricula
                                 print("\nMatricula modificada correctamente")
                             else:
                                 print("Modificacion cancelada")
@@ -377,7 +378,7 @@ def modificarCoche(cochesRaiz):
                 nuevoAnio = input("\nIntroduce un nuevo anio de fabricacion: ").strip()
                 if(nuevoAnio.isdigit() and nuevoAnio != ""):
                     if(confirmacion("Estas seguro de que deseas modificar el anio de fabricacion? (S/N): ")):
-                       coche.find('anio').text = nuevoAnio
+                       coche.find('AnioFabricacion').text = nuevoAnio
                        print("\nAnio modificado correctamente")
                     else:
                         print("Modificacion cancelada")
@@ -388,7 +389,7 @@ def modificarCoche(cochesRaiz):
                 nuevaTarifa = input("\nIntroduce la nueva tarifa por dia: ").strip()
                 if(nuevaTarifa.isdigit() and nuevaTarifa != ""):
                     if(confirmacion("Estas seguro de que deseas modificar la tarifa por dia? (S/N): ")):
-                        coche.find('tarifaPorDia').text = nuevaTarifa
+                        coche.find('TarifaPorDia').text = nuevaTarifa
                         print("\nTarifa modificada correctamente")
                     else:
                         print("Modificacion cancelada")
@@ -473,8 +474,8 @@ def menuAtributos():
     
     fin = False
     while(not fin):
-        print("Elige un atributo")
-        print("\n--- Atributos ---")
+        print("Elige un atributo de los siguientes: ")
+        print("--- Atributos ---")
         print("1 - Matricula")
         print("2 - Marca")
         print("3 - Modelo")
@@ -513,7 +514,8 @@ def repetido(cochesRaiz, matricula):
 def menuCoches():  
     
     """
-    Menu principal para realizar operaciones con la informacion de coches.
+    Menu principal para realizar operaciones con la informacion de coches. 
+    Al salir de este menu se guardan los datos en el fichero.
 
     Args:
         None
@@ -552,6 +554,7 @@ def menuCoches():
         elif(opcion == "5"):
             mostrarCoches(cochesRaiz, None)
         elif(opcion == "0"):
+            #Se guarda al salir de este menu
             guardarCoches(cochesRaiz)
             fin = True
             print("Vuelta Menu Principal")

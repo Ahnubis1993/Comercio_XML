@@ -20,4 +20,14 @@
     <TarifaPorDia>3</TarifaPorDia>
     <Estado>disponible</Estado>
   </Coche>
+  <Coche id="4">
+    <Matricula>1234XXX</Matricula>
+    <Descripcion>
+      <Marca>el coche de paco</Marca>
+      <Modelo>el pacomovil</Modelo>
+    </Descripcion>
+    <AnioFabricacion>2500</AnioFabricacion>
+    <TarifaPorDia>0</TarifaPorDia>
+    <Estado>disponible</Estado>
+  </Coche>
 </Coches>
