@@ -537,12 +537,8 @@ def obtenerFechaDevolucion(alquiler):
         except ValueError:
             print("Debes introducir numeros en la fecha")
         except Exception:
-<<<<<<< Updated upstream
             print("Ocurrió un error en el proceso de devolucion de coche.")
         intentos -= 1
-=======
-            print("Ocurrio un error en el proceso de devolucion de coche.")
->>>>>>> Stashed changes
             
     return alquiler, correcto
 
