@@ -58,17 +58,18 @@ def crearAlquiler(alquileresRaiz, cochesRaiz):
             if(correcto):
                 correcto = obtenerKmInicial(alquiler)
 
-            if(correcto):#TODO Dar la opcion de cancelar
-                #Si se da de alta el alquiler, cambiamos valor del vehiculo a alquilado
-                coche.find('Estado').text="alquilado"
-                if(not confirmacion("Alquiler realizado correctamente. Desea introducir otro alquiler? (S/N): ")):
-                    fin = True
+            #Si no se desea crear el alta, accede a la condicion else y pide introducir otro alquiler
+            if(correcto and confirmacion("Estas seguro que deseas crear el alquiler? (S/N): ")):
+                    #Si se da de alta el alquiler, cambiamos valor del vehiculo a alquilado
+                    coche.find('Estado').text="alquilado"
+                    if(not confirmacion("Alquiler realizado correctamente. Desea introducir otro alquiler? (S/N): ")):
+                            fin = True
             else:
                 if(not confirmacion("Alquiler no realizado con exito. Desea introducir otro alquiler? (S/N): ")):
                     alquileresRaiz.remove(alquiler)
                     fin = True
 
-            if (not correcto):
+            if (not correcto):#FIXME verifciar si tiene alguna funcion o ya se hace en confirmaciones
                 fin = True
     else:
         print("No hay coches guardados. No se puede crear un alquiler sin un coche.")
@@ -193,6 +194,32 @@ def obtenerKmInicial(alquiler):
 def modificarAlquiler(alquileresRaiz): #TODO
     print("--- Modificacion Alquiler ---")
     alquiler = busquedaAlquiler(alquileresRaiz)
+    finModificar = False
+    while(not finModificar):
+        
+        print("Elige una opcion para modificar el alquiler: ")
+        print("1 - Fecha de inicio alquiler")
+        print("2 - Fecha de finalización alquiler")
+        opcion = input("Introduce la opcion a modificar: ")
+        
+        if(opcion== "1"):#TODO si se modifica la fecha inicial, deberia modificarse la fecha final si o si
+            dia = int(input("Introduce el día: "))
+            mes = int(input("Introduce el mes (numerico): "))
+            anio = int(input("Introduce el año: "))
+            
+            # Formar la fecha y verificar su validez
+            fechaInput = f"{dia:02d}/{mes:02d}/{anio}"
+            fechaFin = datetime.strptime(fechaInput, '%d/%m/%Y')
+            fechaFormateada = fechaFin.strftime('%d/%m/%Y')
+            
+        elif(opcion== "2"):
+            nuevaFechaFinalizacion = input("Introduce la nueva fecha de finalización alquiler: ")
+        elif(opcion== "0"):
+            finModificar = True
+            print("Fin modificacion")
+        else:
+            print("Opcion no valida")
+        
 
 def busquedaAlquiler(alquileresRaiz):
     alquiler = None
@@ -259,16 +286,19 @@ def devolverCoche(alquileresRaiz, cochesRaiz):
                 tarifaFinal = tarifaFinal + int(alquiler.find('Recargo').text)
             
             tarifaFinalXML = ET.SubElement(alquiler, 'TarifaFinal')
-            tarifaFinalXML.text = str(tarifaFinal)  
+            tarifaFinalXML.text = tarifaFinal
+            
+            #cambio estado a disponible al final, cuando se ha creado la tarifa
+            coche.find('Estado').text="disponible" 
     
-        except Exception as e:
+        except Exception:
             # no borro tarifa final porque si se pone se crearia todo correctamente
             if(alquiler.find('FechaDevolucionAlquiler') is not None):
                 alquiler.remove(alquiler.find('FechaDevolucionAlquiler'))
             if(alquiler.find('KmFinalAlquiler') is not None): 
                 alquiler.remove(alquiler.find('KmFinalAlquiler'))
             if(alquiler.find('Recargo') is not None):
-                alquiler.remove(alquiler.find('Recargo'))   
+                alquiler.remove(alquiler.find('Recargo'))  
             print("Ocurrió un error en el proceso de devolucion de coche")
         else:
             print("Tarifa final calculada correctamente.")
@@ -284,9 +314,9 @@ def obtenerFechaDevolucion(alquiler):
             anio = int(input("Introduce el año: "))
             
             # Formar la fecha y verificar su validez
-            fechaDevolucion = f"{dia:02d}/{mes:02d}/{anio}"
-            fechaDevoFormato = datetime.strptime(fechaDevolucion, '%d/%m/%Y')
-            fecha_formateada = fechaDevoFormato.strftime('%d/%m/%Y')
+            fechaInput = f"{dia:02d}/{mes:02d}/{anio}"
+            fechaDevolucion = datetime.strptime(fechaInput, '%d/%m/%Y')
+            fecha_formateada = fechaDevolucion.strftime('%d/%m/%Y')
             
             #divido la fechaInicioaAlquiler para formartearla a fecha y comparar
             fechaI = alquiler.find('FechaInicioAlquiler').text.split('/')
@@ -301,20 +331,20 @@ def obtenerFechaDevolucion(alquiler):
             fechaFinalizacionFormato = datetime.strptime(fechaFinali, '%d/%m/%Y')
             
             #la fecha devolucion no puede ser menor que la fecha de inicio de alquiler
-            if fechaDevolucion == fecha_formateada and fechaInicioFormato < fechaDevoFormato:
+            if fechaInput == fecha_formateada and fechaInicioFormato < fechaDevolucion:
                 
                 fechaDevoXML = ET.SubElement(alquiler, 'FechaDevolucionAlquiler')
-                fechaDevoXML.text = fechaDevolucion
+                fechaDevoXML.text = fechaInput
                 
                 #calculo recargo aqui para luego aplicar a tarifa final en caso que haya
-                if(fechaFinalizacionFormato < fechaDevoFormato):
+                if(fechaFinalizacionFormato < fechaDevolucion):
                     recargoXML = ET.SubElement(alquiler, 'Recargo')
                     recargoXML.text = "150"
                     
                 correcto = True
                 print("Fecha devolucion alquiler válida")
             else:
-                if fechaDevolucion != fecha_formateada:
+                if fechaInput != fecha_formateada:
                     print("La fecha devolucion alquiler no coincide con el formato esperado.")
                 else:
                     print("La fecha devolucion alquiler no puede ser menor que la fecha de inicio de alquiler.") 
@@ -332,7 +362,7 @@ def obtenerKmFinal(alquiler):
         kmFinal = input("Introduce km final alquiler - (km): ")
         if(kmFinal.isdigit()):
             kmFinalXML = ET.SubElement(alquiler, 'KmFinalAlquiler')
-            kmFinalXML.text = str(kmFinal)
+            kmFinalXML.text = kmFinal
             correcto = True
             print("KmFinalAlquiler introducido correctamente")
         else:

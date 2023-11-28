@@ -180,6 +180,7 @@ def eliminarCoche(cochesRaiz):
     print("\n--- Eliminar Coche ---")
     coche=buscarCoche(cochesRaiz, True)
     if(coche is not None):
+        #no se puede eliminar un coche que se encuentra en alquiler o en el taller
         if(coche.find('Estado').text != "disponible" and coche.find('Estado').text!= "en taller"):
             if(confirmacion("Estas seguro que deseas eliminar el coche con matricula '"+coche[0].text+"' (S/N)")):
                 cochesRaiz.remove(coche)
@@ -369,7 +370,7 @@ def modificarCoche(cochesRaiz):
                         print("Modificacion cancelada")
                 else:
                     print("Debes introducir un numero")
-            elif(opcion=="6"):
+            elif(opcion=="6"):#FIXME aqui la aplicacion no deberia dejar cambiar el estado nada mas que a en taller, ya lo hace sola cuando creas y devuelves el coche
                 nuevoEstado = input("\nIntroduce el nuevo estado de vehiculo (disponible/alquilado/en taller): ").strip().lower()
                 if(nuevoEstado=="disponible" or nuevoEstado=="alquilado" or nuevoEstado=="en taller"):
                     if(confirmacion("Estas seguro que deseas modificar el estado de vehiculo? S/N")):
